@@ -1,0 +1,83 @@
+🚀 Project Idea Hub
+A collection of real-world, backend-heavy project ideas for you to build meaningful full-stack applications.
+
+You should treat them as starting points, then define your own requirements, database design, APIs, business rules, and additional features.
+
+🧭 How to Use This Hub
+For your chosen idea, define:
+
+Requirement Anlysis with AI
+Users and roles
+Core problem and solution
+Main workflows
+Database entities and relationships
+Business rules
+Authentication and authorization
+Transaction boundaries
+Caching strategy
+Admin operations
+Analytics and reporting
+Important edge cases
+The listed features are suggestions, not fixed requirements. You can add, remove, combine, or redesign them.
+
+4. Developer Assessment & Coding Platform
+Category: Education / Recruitment
+
+Company
+   │
+   ▼
+Create Assessment
+   │
+   ▼
+Add Problems
+   │
+   ▼
+Invite Candidates
+   │
+   ▼
+Candidate Attempts
+   │
+   ▼
+Submission
+   │
+   ▼
+Evaluation
+   │
+   ▼
+Score
+   │
+   ▼
+Company Report
+Possible users
+
+Candidate
+Company/Recruiter
+Assessment Creator
+Evaluator
+Admin
+Possible features
+
+Company profiles
+Candidate profiles
+Problem bank
+Coding questions
+MCQ and written questions
+Assessments
+Candidate invitations
+Timed attempts
+Submissions
+Evaluation
+Results
+Reports
+Anti-cheating features
+Analytics
+Assessment history
+Backend challenges
+
+Assessment lifecycle
+Secure submission handling
+Timer/attempt management
+Evaluation workflow
+Permission management
+Rate limiting
+Isolated code execution if coding execution is implemented

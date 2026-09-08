@@ -1,0 +1,146 @@
+18-7 Setting Up Prisma And DB Connection
+https://www.prisma.io/docs/prisma-postgres/quickstart/prisma-orm
+
+1. git init
+
+2. .gitignore  (file create)  >>> node_modules
+
+3. Prisma -->>> Docs---prisma orm---QuickStar--->>>Prisma Postgres
+1. Create a new project
+
+npm init -y
+npm install typescript tsx @types/node --save-dev
+npx tsc --init
+
+package name - gearup-backend
+version - 0.0.1
+
+entrypoint - server.ts
+type - module
+
+yes - y ok
+
+2. Install required dependencies
+Install the packages needed for this quickstart:
+
+bun
+pnpm
+yarn
+npm
+
+npm install prisma @types/pg --save-dev
+npm install @prisma/client @prisma/adapter-pg pg dotenv
+
+3. Configure ESM support
+remove all >>> tsconfig.json
+create own
+
+{
+  "compilerOptions": {
+    "outDir": "./dist",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "target": "ES2023",
+    "types": ["node"],
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+    "noUncheckedIndexedAccess": true,
+    "strict": true,
+    "isolatedModules": true,
+    "noUncheckedSideEffectImports": true,
+    "moduleDetection": "force",
+    "skipLibCheck": true
+  },
+  // "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
+
+***** add -- "type": "module" changed in package.json "type": "commonjs",
+
+4. Initialize Prisma ORM
+npx prisma
+npx prisma init --output ../generated/prisma
+
+*****prisma.config.ts   hobe  --prisma7.config.ts ata hobe na (Rename)
+
+for prisma.config.ts
+*****create root >>> src folder > a. server.ts b. app.ts
+
+Create a Prisma Postgres database and replace the generated DATABASE_URL in your .env file with the postgres://... connection string from the CLI output:
+
+npx create-db or npx create-db@latest
+
+login >>> https://www.prisma.io/postgres 
+create new DB ---A6 Developer Assessment Coding Platform
+--> Skip Deploy -skip must
+---> Dashboard -Connect to your database
+click ---> Open connect setup --> copy the connection string
+
+A6 Developer Assessment Coding Platform
+postgres://a0f6c7aa26c049699b693eccdd5eadb64ae54d6a8adb115b8fa8cfd89d285ec6:sk_6Qy-e4y5mBo5-xuxMUUfz@pooled.db.prisma.io:5432/postgres?sslmode=require
+
+set .env =ok
+
+
+
+5. Define your data model >>>after
+
+*****express,bcryptjs,cors,cookie-parser,http-status,jwt 
+DT and TS
+TS ok
+
+DS -- npm i @types/express
+npm i express  and  npm i @types/express --save-dev
+
+npm i @types/cors --save-dev
+npm i cookie-parser 
+npm i @types/cookie-parser --save-dev
+npm i @types/jsonwebtoken --save-dev
+
+---------------
+express docs for setup
+
+"scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+
+npm run build
+----------------
+
+7. Instantiate Prisma Client  >>> lib/prisma.ts
+
+src>>>lib/prisma.ts  >>> copy and paste
+
+create prisma client  model 
+
+npx prisma migrate dev 
+npx prisma generate >>> create generate folder ok 
+
+8. Write your first query >>>> script.ts >>> prisma connect
+
+
+
+====.env-->>>config>index.ts ok 
+    middlware ok
+
+ Prisma Model >>> data model >>> 
+ prisma orm >>> data model >>> multi schema
+ >>>  Schema location >>>Prisma Schema location >>> ok
+
+ Multi-file Prisma schema
+
+ prisma/
+├── migrations
+├── models
+│   ├── posts.prisma
+│   ├── users.prisma
+│   └── ... other `.prisma` files
+└── schema.prisma
+
+Prisma>schema>> prisma all file
+
+
