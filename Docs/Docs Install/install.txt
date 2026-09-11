@@ -1,0 +1,6 @@
+Biome 
+npm i -D -E @biomejs/biome
+npx @biomejs/biome init
+npx @biomejs/biome format --write ./src
+
+

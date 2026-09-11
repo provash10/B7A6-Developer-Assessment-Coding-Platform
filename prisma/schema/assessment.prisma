@@ -1,28 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
-generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
-}
-
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
-
-// ==========================================
-// ENUMS
-// ==========================================
-
-enum UserRole {
-  ADMIN
-  RECRUITER
-  CANDIDATE
-}
-
 enum AssessmentStatus {
   DRAFT
   PUBLISHED
@@ -53,76 +28,6 @@ enum AttemptStatus {
   SUBMITTED
   EVALUATED
   TIMED_OUT
-}
-
-enum PaymentProvider {
-  BKASH
-  STRIPE
-  SSLCOMMERZ
-}
-
-enum PaymentStatus {
-  PENDING
-  SUCCESS
-  FAILED
-  CANCELLED
-}
-
-// ==========================================
-// MODELS
-// ==========================================
-
-model User {
-  id           String            @id @default(uuid())
-  email        String            @unique
-  passwordHash String            @map("password_hash")
-  name         String
-  phone        String?
-  role         UserRole          @default(CANDIDATE)
-  createdAt    DateTime          @default(now())
-  updatedAt    DateTime          @updatedAt
-  deletedAt    DateTime?
-
-  recruiterProfile    RecruiterProfile?
-  candidateProfile    CandidateProfile?
-  payments            PaymentTransaction[]
-  auditLogs           AuditLog[]
-
-  @@map("users")
-}
-
-model RecruiterProfile {
-  id             String       @id @default(uuid())
-  userId         String       @unique
-  companyName    String?
-  companyWebsite String?
-  companyLogo    String?
-  credits        Int          @default(0)
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
-  deletedAt      DateTime?
-
-  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  assessments    Assessment[]
-
-  @@map("recruiter_profiles")
-}
-
-model CandidateProfile {
-  id              String                 @id @default(uuid())
-  userId          String                 @unique
-  resumeUrl       String?
-  skills          String[]
-  experienceYears Int?
-  createdAt       DateTime               @default(now())
-  updatedAt       DateTime               @updatedAt
-  deletedAt       DateTime?
-
-  user            User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  invitations     AssessmentInvitation[]
-  attempts        CandidateAttempt[]
-
-  @@map("candidate_profiles")
 }
 
 model Assessment {
@@ -236,38 +141,3 @@ model Submission {
 
   @@map("submissions")
 }
-
-model PaymentTransaction {
-  id             String          @id @default(uuid())
-  userId         String
-  amount         Decimal         @db.Decimal(10, 2)
-  currency       String          @default("BDT")
-  provider       PaymentProvider
-  transactionId  String          @unique
-  status         PaymentStatus   @default(PENDING)
-  paymentDetails Json?
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-
-  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("payment_transactions")
-}
-
-model AuditLog {
-  id         String   @id @default(uuid())
-  userId     String?
-  action     String
-  entityType String
-  entityId   String?
-  oldValue   Json?
-  newValue   Json?
-  ipAddress  String?
-  createdAt  DateTime @default(now())
-
-  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
-
-  @@map("audit_logs")
-}
-
- 
