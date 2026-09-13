@@ -1,19 +1,23 @@
 import type { NextFunction, Request, Response } from "express";
 import type { ZodTypeAny } from "zod";
+import AppError from "../utils/AppError";
 import catchAsync from "../utils/catchAsync";
 
-export const validateRequest = (schema: ZodTypeAny) => {
+export const validateRequest = (zodSchema: ZodTypeAny) => {
 	return catchAsync(async (req: Request, _res: Response, next: NextFunction) => {
-		const parsed = await schema.parseAsync({
-			body: req.body,
-			query: req.query,
-			params: req.params,
-			cookies: req.cookies,
-		});
+		// const payload = req.body ? req.body : {}
+		const payload = req.body ?? {};
 
-		if (parsed && typeof parsed === "object" && "body" in parsed) {
-			req.body = (parsed as { body: unknown }).body;
+		const result = await zodSchema.safeParseAsync(payload);
+
+		if (!result.success) {
+			console.log(result.error);
+			console.log(result.error.issues);
+
+			throw new AppError(400, result.error.issues[0]?.message || "Validation Error");
 		}
+
+		req.body = result.data;
 
 		next();
 	});

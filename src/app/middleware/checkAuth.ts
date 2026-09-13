@@ -22,6 +22,8 @@ declare global {
 	}
 }
 
+// checkAuth(UserRole.ADMIN, UserRole.RECRUITER, UserRole.CANDIDATE)
+// checkAuth() => ...requiredRoles => [UserRole.ADMIN, UserRole.RECRUITER]
 export const checkAuth = (...requiredRoles: UserRole[]) => {
 	return catchAsync(async (req: Request, _res: Response, next: NextFunction) => {
 		const token = req.cookies?.accessToken

@@ -20,6 +20,7 @@ export const register = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const login = catchAsync(async (req: Request, res: Response) => {
+	// console.log(req.body);
 	const result = await AuthService.loginUser(req.body);
 
 	res.cookie("refreshToken", result.refreshToken, {

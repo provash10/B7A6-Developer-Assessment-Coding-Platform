@@ -13,7 +13,12 @@ export const createToken = (
 };
 
 export const verifyToken = (token: string, secret: Secret): JwtPayload | string => {
-	return jwt.verify(token, secret);
+	try {
+		return jwt.verify(token, secret);
+	} catch (error: any) {
+		console.log("Token verification failed:", error);
+		throw error;
+	}
 };
 
 export const jwtUtils = {

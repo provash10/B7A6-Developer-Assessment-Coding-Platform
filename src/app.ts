@@ -10,13 +10,15 @@ const app: Application = express();
 // Parsers
 app.use(cors());
 app.use(cookieParser());
+// Middleware to parse JSON bodies
 app.use(express.json());
+// Enable URL-encoded form data parsing
 app.use(express.urlencoded({ extended: true }));
 
 // Application Routes
 app.use("/api/v1", router);
 
-// Root Route
+// Basic route
 app.get("/", (_req: Request, res: Response) => {
 	res.send({
 		message: "Developer Assessment Coding Platform API Server is Running!",

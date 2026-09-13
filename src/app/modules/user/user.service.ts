@@ -74,6 +74,7 @@ export const updateMyProfile = async (
 		return userResult;
 	});
 
+	// console.log(updatedUser);
 	return getMyProfile(updatedUser.id);
 };
 

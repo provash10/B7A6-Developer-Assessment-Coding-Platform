@@ -9,14 +9,20 @@ export type TErrorSources = {
 	message: string;
 }[];
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const globalErrorHandler: ErrorRequestHandler = (
 	err: any,
 	_req: Request,
 	res: Response,
 	_next: NextFunction,
 ) => {
+	if (config.env === "development") {
+		console.log("Error from Global Error Handler", err);
+	}
+
 	let statusCode = 500;
 	let message = "Something went wrong!";
+	// let errorDetails = err.stack
 	let errorSources: TErrorSources = [
 		{
 			path: "",
