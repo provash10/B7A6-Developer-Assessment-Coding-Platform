@@ -10,134 +10,63 @@ enum QuestionType {
   DESCRIPTIVE
 }
 
-enum Difficulty {
+enum QuestionDifficulty {
   EASY
   MEDIUM
   HARD
 }
 
-enum InviteStatus {
-  PENDING
-  ACCEPTED
-  EXPIRED
-}
-
-enum AttemptStatus {
-  NOT_STARTED
-  IN_PROGRESS
-  SUBMITTED
-  EVALUATED
-  TIMED_OUT
-}
-
 model Assessment {
-  id              String                 @id @default(uuid())
-  recruiterId     String
+  id              String            @id @default(uuid())
+  recruiterId     String            @map("recruiter_id")
   title           String
-  description     String?
-  durationMinutes Int
-  passMarks       Float?
-  totalMarks      Float                  @default(100.0)
-  status          AssessmentStatus       @default(DRAFT)
-  startTime       DateTime?
-  endTime         DateTime?
-  createdAt       DateTime               @default(now())
-  updatedAt       DateTime               @updatedAt
-  deletedAt       DateTime?
+  description     String            @db.Text
+  durationMinutes Int               @map("duration_minutes")
+  passMarks       Float             @map("pass_marks")
+  totalMarks      Float             @default(0) @map("total_marks")
+  status          AssessmentStatus  @default(DRAFT)
+  startTime       DateTime?         @map("start_time")
+  endTime         DateTime?         @map("end_time")
+  createdAt       DateTime          @default(now()) @map("created_at")
+  updatedAt       DateTime          @updatedAt @map("updated_at")
+  deletedAt       DateTime?         @map("deleted_at")
 
-  recruiter       RecruiterProfile       @relation(fields: [recruiterId], references: [id], onDelete: Cascade)
-  questions       AssessmentQuestion[]
-  invitations     AssessmentInvitation[]
-  attempts        CandidateAttempt[]
+  recruiter           RecruiterProfile       @relation(fields: [recruiterId], references: [id], onDelete: Cascade)
+  assessmentQuestions AssessmentQuestion[]
+  invitations         AssessmentInvitation[]
+  attempts            CandidateAttempt[]
 
   @@map("assessments")
 }
 
 model Question {
-  id          String               @id @default(uuid())
+  id          String             @id @default(uuid())
   title       String
-  description String
-  type        QuestionType         @default(CODING)
-  difficulty  Difficulty           @default(MEDIUM)
-  marks       Float                @default(10.0)
-  testCases   Json?
+  description String             @db.Text
+  type        QuestionType
+  difficulty  QuestionDifficulty @default(MEDIUM)
+  marks       Float              @default(10)
+  testCases   Json?              @map("test_cases")
   options     Json?
-  createdAt   DateTime             @default(now())
-  updatedAt   DateTime             @updatedAt
-  deletedAt   DateTime?
+  createdAt   DateTime           @default(now()) @map("created_at")
+  updatedAt   DateTime           @updatedAt @map("updated_at")
+  deletedAt   DateTime?          @map("deleted_at")
 
-  assessments AssessmentQuestion[]
-  submissions Submission[]
+  assessmentQuestions AssessmentQuestion[]
+  submissions         Submission[]
 
   @@map("questions")
 }
 
 model AssessmentQuestion {
-  id           String     @id @default(uuid())
-  assessmentId String
-  questionId   String
-  orderIndex   Int        @default(1)
-  createdAt    DateTime   @default(now())
+  id           String @id @default(uuid())
+  assessmentId String @map("assessment_id")
+  questionId   String @map("question_id")
+  orderIndex   Int    @default(1) @map("order_index")
 
-  assessment   Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
-  question     Question   @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  assessment Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  question   Question   @relation(fields: [questionId], references: [id], onDelete: Cascade)
 
   @@unique([assessmentId, questionId])
   @@map("assessment_questions")
-}
-
-model AssessmentInvitation {
-  id           String           @id @default(uuid())
-  assessmentId String
-  candidateId  String
-  inviteToken  String           @unique
-  status       InviteStatus     @default(PENDING)
-  expiresAt    DateTime
-  createdAt    DateTime         @default(now())
-  updatedAt    DateTime         @updatedAt
-  deletedAt    DateTime?
-
-  assessment   Assessment       @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
-  candidate    CandidateProfile @relation(fields: [candidateId], references: [id], onDelete: Cascade)
-
-  @@map("assessment_invitations")
-}
-
-model CandidateAttempt {
-  id             String           @id @default(uuid())
-  assessmentId   String
-  candidateId    String
-  status         AttemptStatus    @default(NOT_STARTED)
-  startedAt      DateTime         @default(now())
-  submittedAt    DateTime?
-  totalScore     Float?
-  isPassed       Boolean?
-  antiCheatFlags Int              @default(0)
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
-  deletedAt      DateTime?
-
-  assessment     Assessment       @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
-  candidate      CandidateProfile @relation(fields: [candidateId], references: [id], onDelete: Cascade)
-  submissions    Submission[]
-
-  @@map("candidate_attempts")
-}
-
-model Submission {
-  id             String           @id @default(uuid())
-  attemptId      String
-  questionId     String
-  submittedCode  String?
-  selectedOption String?
-  verdict        String?
-  scoreObtained  Float?
-  executionTime  Int?             // in milliseconds
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
-
-  attempt        CandidateAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
-  question       Question         @relation(fields: [questionId], references: [id], onDelete: Cascade)
-
-  @@map("submissions")
 }

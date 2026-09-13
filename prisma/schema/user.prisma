@@ -5,54 +5,54 @@ enum UserRole {
 }
 
 model User {
-  id           String            @id @default(uuid())
-  email        String            @unique
-  passwordHash String            @map("password_hash")
+  id           String    @id @default(uuid())
+  email        String    @unique
+  passwordHash String    @map("password_hash")
   name         String
   phone        String?
-  role         UserRole          @default(CANDIDATE)
-  createdAt    DateTime          @default(now())
-  updatedAt    DateTime          @updatedAt
-  deletedAt    DateTime?
+  role         UserRole  @default(CANDIDATE)
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  deletedAt    DateTime? @map("deleted_at")
 
-  recruiterProfile    RecruiterProfile?
-  candidateProfile    CandidateProfile?
-  payments            PaymentTransaction[]
-  auditLogs           AuditLog[]
+  recruiterProfile RecruiterProfile?
+  candidateProfile CandidateProfile?
+  payments         PaymentTransaction[]
+  auditLogs        AuditLog[]
 
   @@map("users")
 }
 
 model RecruiterProfile {
-  id             String       @id @default(uuid())
-  userId         String       @unique
-  companyName    String?
-  companyWebsite String?
-  companyLogo    String?
-  credits        Int          @default(0)
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
-  deletedAt      DateTime?
+  id             String    @id @default(uuid())
+  userId         String    @unique @map("user_id")
+  companyName    String?   @map("company_name")
+  companyWebsite String?   @map("company_website")
+  companyLogo    String?   @map("company_logo")
+  credits        Int       @default(0)
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+  deletedAt      DateTime? @map("deleted_at")
 
-  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  assessments    Assessment[]
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  assessments Assessment[]
 
   @@map("recruiter_profiles")
 }
 
 model CandidateProfile {
-  id              String                 @id @default(uuid())
-  userId          String                 @unique
-  resumeUrl       String?
+  id              String    @id @default(uuid())
+  userId          String    @unique @map("user_id")
+  resumeUrl       String?   @map("resume_url")
   skills          String[]
-  experienceYears Int?
-  createdAt       DateTime               @default(now())
-  updatedAt       DateTime               @updatedAt
-  deletedAt       DateTime?
+  experienceYears Int?      @map("experience_years")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  deletedAt       DateTime? @map("deleted_at")
 
-  user            User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  invitations     AssessmentInvitation[]
-  attempts        CandidateAttempt[]
+  user        User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  invitations AssessmentInvitation[]
+  attempts    CandidateAttempt[]
 
   @@map("candidate_profiles")
 }

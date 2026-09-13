@@ -1,0 +1,44 @@
+enum PaymentProvider {
+  BKASH
+  STRIPE
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  CANCELLED
+}
+
+model PaymentTransaction {
+  id             String          @id @default(uuid())
+  userId         String          @map("user_id")
+  amount         Decimal         @db.Decimal(8, 2)
+  currency       String          @default("BDT")
+  provider       PaymentProvider
+  transactionId  String          @unique @map("transaction_id")
+  status         PaymentStatus   @default(PENDING)
+  paymentDetails Json?           @map("payment_details")
+  createdAt      DateTime        @default(now()) @map("created_at")
+  updatedAt      DateTime        @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("payment_transactions")
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  userId     String   @map("user_id")
+  action     String
+  entityType String   @map("entity_type")
+  entityId   String   @map("entity_id")
+  oldValue   Json?    @map("old_value")
+  newValue   Json?    @map("new_value")
+  ipAddress  String?  @map("ip_address")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("audit_logs")
+}

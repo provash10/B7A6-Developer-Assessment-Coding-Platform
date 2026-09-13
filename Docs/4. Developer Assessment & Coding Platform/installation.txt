@@ -1,3 +1,6 @@
+DATABASE_URL="postgres://a0f6c7aa26c049699b693eccdd5eadb64ae54d6a8adb115b8fa8cfd89d285ec6:sk_6Qy-e4y5mBo5-xuxMUUfz@pooled.db.prisma.io:5432/postgres?sslmode=require"
+
+
 18-7 Setting Up Prisma And DB Connection
 https://www.prisma.io/docs/prisma-postgres/quickstart/prisma-orm
 

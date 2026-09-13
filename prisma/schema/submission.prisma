@@ -1,0 +1,67 @@
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
+}
+
+enum AttemptStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  SUBMITTED
+}
+
+model AssessmentInvitation {
+  id           String           @id @default(uuid())
+  assessmentId String           @map("assessment_id")
+  candidateId  String           @map("candidate_id")
+  inviteToken  String           @unique @map("invite_token")
+  status       InvitationStatus @default(PENDING)
+  expiresAt    DateTime         @map("expires_at")
+  createdAt    DateTime         @default(now()) @map("created_at")
+  updatedAt    DateTime         @updatedAt @map("updated_at")
+  deletedAt    DateTime?        @map("deleted_at")
+
+  assessment Assessment       @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  candidate  CandidateProfile @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+
+  @@map("assessment_invitations")
+}
+
+model CandidateAttempt {
+  id             String        @id @default(uuid())
+  assessmentId   String        @map("assessment_id")
+  candidateId    String        @map("candidate_id")
+  status         AttemptStatus @default(NOT_STARTED)
+  startedAt      DateTime?     @map("started_at")
+  submittedAt    DateTime?     @map("submitted_at")
+  totalScore     Float         @default(0) @map("total_score")
+  isPassed       Boolean       @default(false) @map("is_passed")
+  antiCheatFlags Int           @default(0) @map("anti_cheat_flags")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+  deletedAt      DateTime?     @map("deleted_at")
+
+  assessment  Assessment       @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  candidate   CandidateProfile @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  submissions Submission[]
+
+  @@map("candidate_attempts")
+}
+
+model Submission {
+  id             String   @id @default(uuid())
+  attemptId      String   @map("attempt_id")
+  questionId     String   @map("question_id")
+  submittedCode  String?  @db.Text @map("submitted_code")
+  selectedOption String?  @map("selected_option")
+  verdict        String?
+  scoreObtained  Float    @default(0) @map("score_obtained")
+  executionTime  Int?     @map("execution_time")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  attempt  CandidateAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  question Question         @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@map("submissions")
+}
