@@ -3,7 +3,7 @@ import jwt, { type JwtPayload, type Secret, type SignOptions } from "jsonwebtoke
 export const createToken = (
 	payload: Record<string, unknown>,
 	secret: Secret,
-	expiresIn: SignOptions["expiresIn"],
+	expiresIn: any,
 ): string => {
 	const token = jwt.sign(payload, secret, {
 		expiresIn,
