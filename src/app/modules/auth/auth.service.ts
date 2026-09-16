@@ -68,7 +68,9 @@ export const registerUser = async (payload: IRegisterUserInput) => {
 			otp: "VERIFIED",
 			expirationMinutes: 10,
 		},
-	}).catch((err) => console.log("Email sending error:", err));
+	}).catch((err) => {
+		// console.log("Email sending error:", err);
+	});
 
 	const accessToken = jwt.sign(
 		{
@@ -214,7 +216,9 @@ export const resetPassword = async (payload: IResetPasswordInput) => {
 		subject: "Password Reset Successful",
 		templateName: "reset-password-success",
 		templateData: { name: user.name },
-	}).catch((err) => console.log("Email error:", err));
+	}).catch((err) => {
+		// console.log("Email error:", err);
+	});
 
 	return { message: "Password reset completed successfully." };
 };

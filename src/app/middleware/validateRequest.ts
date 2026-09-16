@@ -14,8 +14,8 @@ export const validateRequest = (zodSchema: ZodTypeAny) => {
 			});
 
 			if (!result.success) {
-				console.log(result.error);
-				console.log(result.error.issues);
+				// console.log(result.error);
+				// console.log(result.error.issues);
 
 				throw new AppError(
 					400,
@@ -23,7 +23,7 @@ export const validateRequest = (zodSchema: ZodTypeAny) => {
 				);
 			}
 
-			req.body = result.data.body;
+			req.body = (result.data as Record<string, any>)?.body;
 
 			next();
 		},

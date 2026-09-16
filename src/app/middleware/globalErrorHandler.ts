@@ -22,7 +22,7 @@ export const globalErrorHandler: ErrorRequestHandler = (
 	_next: NextFunction,
 ) => {
 	if (config.env === "development") {
-		console.log("Error from Global Error Handler", err);
+		// console.log("Error from Global Error Handler", err);
 	}
 
 	let statusCode = 500;

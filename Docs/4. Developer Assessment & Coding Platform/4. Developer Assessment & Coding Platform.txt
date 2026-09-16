@@ -20,6 +20,8 @@ Analytics and reporting
 Important edge cases
 The listed features are suggestions, not fixed requirements. You can add, remove, combine, or redesign them.
 
+DATABASE_URL="postgres://a0f6c7aa26c049699b693eccdd5eadb64ae54d6a8adb115b8fa8cfd89d285ec6:sk_6Qy-e4y5mBo5-xuxMUUfz@pooled.db.prisma.io:5432/postgres?sslmode=require"
+
 4. Developer Assessment & Coding Platform
 Category: Education / Recruitment
 

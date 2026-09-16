@@ -6,9 +6,9 @@ let server: Server;
 
 async function main() {
 	try {
-		console.log("Connected to the database successfully.");
+		// console.log("Connected to the database successfully.");
 		server = app.listen(config.port, () => {
-			console.log(`Server is running on port ${config.port}`);
+			// console.log(`Server is running on port ${config.port}`);
 		});
 	} catch (err) {
 		console.error("Failed to start server:", err);
@@ -18,7 +18,7 @@ async function main() {
 main();
 
 process.on("unhandledRejection", (err) => {
-	console.log("Unhandled Rejection detected, shutting down server...", err);
+	// console.log("Unhandled Rejection detected, shutting down server...", err);
 	if (server) {
 		server.close(() => {
 			process.exit(1);
@@ -29,6 +29,6 @@ process.on("unhandledRejection", (err) => {
 });
 
 process.on("uncaughtException", (err) => {
-	console.log("Uncaught Exception detected, shutting down server...", err);
+	// console.log("Uncaught Exception detected, shutting down server...", err);
 	process.exit(1);
 });
