@@ -1,0 +1,176 @@
+{
+  "info": {
+    "_postman_id": "a8c23608-090b-494a-aeb1-9e6fac170e20",
+    "name": "A6 Developer Assessment Coding Platform",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "45096706",
+    "_collection_link": "https://go.postman.co/collection/45096706-a8c23608-090b-494a-aeb1-9e6fac170e20?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "User",
+      "item": [
+        {
+          "name": "Get My Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": ""
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:5000/api/v1/users/me",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "me"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer "
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:5000/api/v1/appointment/book-appointment",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "v1",
+                "appointment",
+                "book-appointment"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"admin-2@100.com\",\n  \"password\": \"Password@100\"\n    \n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/v1/auth/login",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Admin-2\",\r\n  \"email\": \"admin-1@100.com\",\r\n  \"password\": \"Password@100\",\r\n  \"phone\": \"+8801700001111\",\r\n  \"role\": \"ADMIN\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/v1/auth/register",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "json_web_token_08ka",
+      "secret": true
+    },
+    {
+      "key": "bearer_token_004n",
+      "secret": true
+    },
+    {
+      "key": "json_web_token_1dow",
+      "secret": true
+    },
+    {
+      "key": "bearer_token_0y6w",
+      "secret": true
+    },
+    {
+      "key": "bearer_token_0pyg",
+      "secret": true
+    },
+    {
+      "key": "json_web_token_09rz",
+      "secret": true
+    },
+    {
+      "key": "json_web_token_0jqw",
+      "secret": true
+    },
+    {
+      "key": "bearer_token_0ut6",
+      "secret": true
+    }
+  ]
+}
