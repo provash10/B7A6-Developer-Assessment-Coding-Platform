@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { AssessmentRoutes } from "../modules/assessment/assessment.route";
 import { AuthRoutes } from "../modules/auth/auth.route";
 import { QuestionRoutes } from "../modules/question/question.route";
 import { UserRoutes } from "../modules/user/user.route";
@@ -17,6 +18,10 @@ const moduleRoutes: { path: string; route: any }[] = [
 	{
 		path: "/questions",
 		route: QuestionRoutes,
+	},
+	{
+		path: "/assessments",
+		route: AssessmentRoutes,
 	},
 ];
 
