@@ -141,7 +141,6 @@ export const deleteQuestion = async (id: string) => {
 	const existingQuestion = await prisma.question.findFirst({
 		where: {
 			id,
-			deletedAt: null,
 		},
 	});
 
@@ -149,11 +148,8 @@ export const deleteQuestion = async (id: string) => {
 		throw new AppError(404, "Question not found.");
 	}
 
-	const deletedQuestion = await prisma.question.update({
+	const deletedQuestion = await prisma.question.delete({
 		where: { id },
-		data: {
-			deletedAt: new Date(),
-		},
 	});
 
 	return deletedQuestion;
