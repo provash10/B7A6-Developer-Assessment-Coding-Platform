@@ -1,6 +1,10 @@
+import type { Prisma } from "@prisma/client";
 import { prisma } from "../../lib/prisma";
 import AppError from "../../utils/AppError";
-import type { ICreateAssessmentInput } from "./assessment.interface";
+import type {
+	IAssessmentFilterParams,
+	ICreateAssessmentInput,
+} from "./assessment.interface";
 
 export const createAssessment = async (
 	userId: string,
@@ -105,6 +109,120 @@ export const createAssessment = async (
 	return createdAssessment;
 };
 
+export const getAllAssessments = async (query: IAssessmentFilterParams) => {
+	const page = Number(query.page) || 1;
+	const limit = Number(query.limit) || 10;
+	const skip = (page - 1) * limit;
+
+	const whereConditions: Prisma.AssessmentWhereInput = {
+		deletedAt: null,
+	};
+
+	if (query.searchTerm) {
+		whereConditions.OR = [
+			{ title: { contains: query.searchTerm, mode: "insensitive" } },
+			{ description: { contains: query.searchTerm, mode: "insensitive" } },
+		];
+	}
+
+	if (query.status) {
+		whereConditions.status = query.status;
+	}
+
+	if (query.recruiterId) {
+		whereConditions.recruiterId = query.recruiterId;
+	}
+
+	const sortBy = query.sortBy || "createdAt";
+	const sortOrder = query.sortOrder === "asc" ? "asc" : "desc";
+
+	const total = await prisma.assessment.count({ where: whereConditions });
+	const assessments = await prisma.assessment.findMany({
+		where: whereConditions,
+		skip,
+		take: limit,
+		orderBy: { [sortBy]: sortOrder },
+		include: {
+			recruiter: {
+				select: {
+					id: true,
+					companyName: true,
+					user: {
+						select: {
+							name: true,
+							email: true,
+						},
+					},
+				},
+			},
+			_count: {
+				select: {
+					assessmentQuestions: true,
+					invitations: true,
+					attempts: true,
+				},
+			},
+		},
+	});
+
+	return {
+		meta: {
+			page,
+			limit,
+			total,
+			totalPages: Math.ceil(total / limit),
+		},
+		data: assessments,
+	};
+};
+
+export const getAssessmentById = async (id: string) => {
+	const assessment = await prisma.assessment.findFirst({
+		where: {
+			id,
+			deletedAt: null,
+		},
+		include: {
+			recruiter: {
+				select: {
+					id: true,
+					companyName: true,
+					companyWebsite: true,
+					user: {
+						select: {
+							name: true,
+							email: true,
+							phone: true,
+						},
+					},
+				},
+			},
+			assessmentQuestions: {
+				orderBy: {
+					orderIndex: "asc",
+				},
+				include: {
+					question: true,
+				},
+			},
+			_count: {
+				select: {
+					invitations: true,
+					attempts: true,
+				},
+			},
+		},
+	});
+
+	if (!assessment) {
+		throw new AppError(404, "Assessment not found.");
+	}
+
+	return assessment;
+};
+
 export const AssessmentService = {
 	createAssessment,
+	getAllAssessments,
+	getAssessmentById,
 };

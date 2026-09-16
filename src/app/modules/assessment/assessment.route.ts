@@ -13,4 +13,16 @@ router.post(
 	AssessmentController.createAssessment,
 );
 
+router.get(
+	"/",
+	checkAuth("ADMIN", "RECRUITER", "CANDIDATE"),
+	AssessmentController.getAllAssessments,
+);
+
+router.get(
+	"/:id",
+	checkAuth("ADMIN", "RECRUITER", "CANDIDATE"),
+	AssessmentController.getSingleAssessment,
+);
+
 export const AssessmentRoutes = router;
