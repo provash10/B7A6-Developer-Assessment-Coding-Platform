@@ -48,8 +48,81 @@ export const getSingleAssessment = catchAsync(
 	},
 );
 
+export const updateAssessment = catchAsync(
+	async (req: Request, res: Response) => {
+		const { id } = req.params;
+		// console.log("Controller updating assessment ID:", id, "payload:", req.body);
+		const result = await AssessmentService.updateAssessment(
+			id as string,
+			req.body,
+		);
+
+		sendResponse(res, {
+			statusCode: 200,
+			success: true,
+			message: "Assessment updated successfully",
+			data: result,
+		});
+	},
+);
+
+export const addQuestionToAssessment = catchAsync(
+	async (req: Request, res: Response) => {
+		const { id } = req.params;
+		// console.log("Controller adding question to assessment ID:", id);
+		const result = await AssessmentService.addQuestionToAssessment(
+			id as string,
+			req.body,
+		);
+
+		sendResponse(res, {
+			statusCode: 200,
+			success: true,
+			message: "Question added to assessment successfully",
+			data: result,
+		});
+	},
+);
+
+export const removeQuestionFromAssessment = catchAsync(
+	async (req: Request, res: Response) => {
+		const { id, questionId } = req.params;
+		// console.log("Controller removing question:", questionId, "from assessment:", id);
+		const result = await AssessmentService.removeQuestionFromAssessment(
+			id as string,
+			questionId as string,
+		);
+
+		sendResponse(res, {
+			statusCode: 200,
+			success: true,
+			message: "Question removed from assessment successfully",
+			data: result,
+		});
+	},
+);
+
+export const deleteAssessment = catchAsync(
+	async (req: Request, res: Response) => {
+		const { id } = req.params;
+		// console.log("Controller deleting assessment ID:", id);
+		const result = await AssessmentService.deleteAssessment(id as string);
+
+		sendResponse(res, {
+			statusCode: 200,
+			success: true,
+			message: "Assessment deleted successfully",
+			data: result,
+		});
+	},
+);
+
 export const AssessmentController = {
 	createAssessment,
 	getAllAssessments,
 	getSingleAssessment,
+	updateAssessment,
+	addQuestionToAssessment,
+	removeQuestionFromAssessment,
+	deleteAssessment,
 };

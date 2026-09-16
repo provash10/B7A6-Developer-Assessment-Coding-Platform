@@ -25,4 +25,30 @@ router.get(
 	AssessmentController.getSingleAssessment,
 );
 
+router.patch(
+	"/:id",
+	checkAuth("ADMIN", "RECRUITER"),
+	validateRequest(AssessmentValidation.updateAssessmentZodSchema),
+	AssessmentController.updateAssessment,
+);
+
+router.post(
+	"/:id/questions",
+	checkAuth("ADMIN", "RECRUITER"),
+	validateRequest(AssessmentValidation.addQuestionZodSchema),
+	AssessmentController.addQuestionToAssessment,
+);
+
+router.delete(
+	"/:id/questions/:questionId",
+	checkAuth("ADMIN", "RECRUITER"),
+	AssessmentController.removeQuestionFromAssessment,
+);
+
+router.delete(
+	"/:id",
+	checkAuth("ADMIN", "RECRUITER"),
+	AssessmentController.deleteAssessment,
+);
+
 export const AssessmentRoutes = router;

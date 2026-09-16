@@ -2,8 +2,10 @@ import type { Prisma } from "@prisma/client";
 import { prisma } from "../../lib/prisma";
 import AppError from "../../utils/AppError";
 import type {
+	IAddQuestionToAssessmentInput,
 	IAssessmentFilterParams,
 	ICreateAssessmentInput,
+	IUpdateAssessmentInput,
 } from "./assessment.interface";
 
 export const createAssessment = async (
@@ -221,8 +223,207 @@ export const getAssessmentById = async (id: string) => {
 	return assessment;
 };
 
+export const updateAssessment = async (
+	id: string,
+	payload: IUpdateAssessmentInput,
+) => {
+	const existingAssessment = await prisma.assessment.findFirst({
+		where: { id, deletedAt: null },
+		include: {
+			assessmentQuestions: true,
+		},
+	});
+
+	if (!existingAssessment) {
+		throw new AppError(404, "Assessment not found.");
+	}
+
+	if (
+		payload.status === "PUBLISHED" &&
+		existingAssessment.assessmentQuestions.length === 0
+	) {
+		throw new AppError(
+			400,
+			"Cannot publish an assessment with zero assigned questions.",
+		);
+	}
+
+	const updatedAssessment = await prisma.assessment.update({
+		where: { id },
+		data: {
+			...(payload.title !== undefined && { title: payload.title }),
+			...(payload.description !== undefined && {
+				description: payload.description,
+			}),
+			...(payload.durationMinutes !== undefined && {
+				durationMinutes: payload.durationMinutes,
+			}),
+			...(payload.passMarks !== undefined && { passMarks: payload.passMarks }),
+			...(payload.status !== undefined && { status: payload.status }),
+			...(payload.startTime !== undefined && {
+				startTime: payload.startTime ? new Date(payload.startTime) : null,
+			}),
+			...(payload.endTime !== undefined && {
+				endTime: payload.endTime ? new Date(payload.endTime) : null,
+			}),
+		},
+		include: {
+			assessmentQuestions: {
+				include: { question: true },
+				orderBy: { orderIndex: "asc" },
+			},
+		},
+	});
+
+	return updatedAssessment;
+};
+
+export const addQuestionToAssessment = async (
+	assessmentId: string,
+	payload: IAddQuestionToAssessmentInput,
+) => {
+	const assessment = await prisma.assessment.findFirst({
+		where: { id: assessmentId, deletedAt: null },
+	});
+
+	if (!assessment) {
+		throw new AppError(404, "Assessment not found.");
+	}
+
+	const question = await prisma.question.findFirst({
+		where: { id: payload.questionId, deletedAt: null },
+	});
+
+	if (!question) {
+		throw new AppError(404, "Question not found.");
+	}
+
+	const existingAssignment = await prisma.assessmentQuestion.findUnique({
+		where: {
+			assessmentId_questionId: {
+				assessmentId,
+				questionId: payload.questionId,
+			},
+		},
+	});
+
+	if (existingAssignment) {
+		throw new AppError(400, "Question is already assigned to this assessment.");
+	}
+
+	let orderIndex = payload.orderIndex;
+	if (!orderIndex) {
+		const maxOrder = await prisma.assessmentQuestion.aggregate({
+			where: { assessmentId },
+			_max: { orderIndex: true },
+		});
+		orderIndex = (maxOrder._max.orderIndex || 0) + 1;
+	}
+
+	await prisma.$transaction(async (tx) => {
+		await tx.assessmentQuestion.create({
+			data: {
+				assessmentId,
+				questionId: payload.questionId,
+				orderIndex,
+			},
+		});
+
+		const allAssignedQuestions = await tx.assessmentQuestion.findMany({
+			where: { assessmentId },
+			include: { question: true },
+		});
+
+		const newTotalMarks = allAssignedQuestions.reduce(
+			(sum, aq) => sum + aq.question.marks,
+			0,
+		);
+
+		await tx.assessment.update({
+			where: { id: assessmentId },
+			data: { totalMarks: newTotalMarks },
+		});
+	});
+
+	return getAssessmentById(assessmentId);
+};
+
+export const removeQuestionFromAssessment = async (
+	assessmentId: string,
+	questionId: string,
+) => {
+	const assessment = await prisma.assessment.findFirst({
+		where: { id: assessmentId, deletedAt: null },
+	});
+
+	if (!assessment) {
+		throw new AppError(404, "Assessment not found.");
+	}
+
+	const existingAssignment = await prisma.assessmentQuestion.findUnique({
+		where: {
+			assessmentId_questionId: {
+				assessmentId,
+				questionId,
+			},
+		},
+	});
+
+	if (!existingAssignment) {
+		throw new AppError(404, "Question is not assigned to this assessment.");
+	}
+
+	await prisma.$transaction(async (tx) => {
+		await tx.assessmentQuestion.delete({
+			where: {
+				assessmentId_questionId: {
+					assessmentId,
+					questionId,
+				},
+			},
+		});
+
+		const remainingQuestions = await tx.assessmentQuestion.findMany({
+			where: { assessmentId },
+			include: { question: true },
+		});
+
+		const newTotalMarks = remainingQuestions.reduce(
+			(sum, aq) => sum + aq.question.marks,
+			0,
+		);
+
+		await tx.assessment.update({
+			where: { id: assessmentId },
+			data: { totalMarks: newTotalMarks },
+		});
+	});
+
+	return getAssessmentById(assessmentId);
+};
+
+export const deleteAssessment = async (id: string) => {
+	const existingAssessment = await prisma.assessment.findFirst({
+		where: { id },
+	});
+
+	if (!existingAssessment) {
+		throw new AppError(404, "Assessment not found.");
+	}
+
+	const deletedAssessment = await prisma.assessment.delete({
+		where: { id },
+	});
+
+	return deletedAssessment;
+};
+
 export const AssessmentService = {
 	createAssessment,
 	getAllAssessments,
 	getAssessmentById,
+	updateAssessment,
+	addQuestionToAssessment,
+	removeQuestionFromAssessment,
+	deleteAssessment,
 };
