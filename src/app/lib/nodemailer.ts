@@ -1,7 +1,7 @@
-import fs from "fs";
-import path from "path";
 import ejs from "ejs";
+import fs from "fs";
 import nodemailer from "nodemailer";
+import path from "path";
 import config from "../config";
 
 export const transporter = nodemailer.createTransport({

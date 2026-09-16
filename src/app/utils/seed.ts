@@ -5,16 +5,16 @@ async function seed() {
 	try {
 		console.log("🌱 Seeding initial database records...");
 
-		const adminPassword = await bcrypt.hash("Admin123!", 10);
-		const recruiterPassword = await bcrypt.hash("Recruiter123!", 10);
-		const candidatePassword = await bcrypt.hash("Candidate123!", 10);
+		const adminPassword = await bcrypt.hash("Password@100", 10);
+		const recruiterPassword = await bcrypt.hash("Password@100", 10);
+		const candidatePassword = await bcrypt.hash("Password@100", 10);
 
 		// 1. Seed Admin User
 		const adminUser = await prisma.user.upsert({
-			where: { email: "admin@assessment.com" },
-			update: {},
+			where: { email: "admin@100.com" },
+			update: { passwordHash: adminPassword },
 			create: {
-				email: "admin@assessment.com",
+				email: "admin@100.com",
 				passwordHash: adminPassword,
 				name: "System Admin",
 				phone: "+8801700000000",
@@ -25,10 +25,10 @@ async function seed() {
 
 		// 2. Seed Recruiter User & Profile
 		const recruiterUser = await prisma.user.upsert({
-			where: { email: "recruiter@techcorp.com" },
-			update: {},
+			where: { email: "recruiter@100.com" },
+			update: { passwordHash: recruiterPassword },
 			create: {
-				email: "recruiter@techcorp.com",
+				email: "recruiter@100.com",
 				passwordHash: recruiterPassword,
 				name: "Jane Recruiter",
 				phone: "+8801711111111",
@@ -49,17 +49,23 @@ async function seed() {
 
 		// 3. Seed Candidate User & Profile
 		const candidateUser = await prisma.user.upsert({
-			where: { email: "candidate@dev.com" },
-			update: {},
+			where: { email: "candidate@100.com" },
+			update: { passwordHash: candidatePassword },
 			create: {
-				email: "candidate@dev.com",
+				email: "candidate@100.com",
 				passwordHash: candidatePassword,
 				name: "John Developer",
 				phone: "+8801722222222",
 				role: "CANDIDATE",
 				candidateProfile: {
 					create: {
-						skills: ["TypeScript", "Node.js", "Express", "Prisma", "PostgreSQL"],
+						skills: [
+							"TypeScript",
+							"Node.js",
+							"Express",
+							"Prisma",
+							"PostgreSQL",
+						],
 						experienceYears: 3,
 						resumeUrl: "https://example.com/resumes/john-dev.pdf",
 					},
@@ -75,7 +81,8 @@ async function seed() {
 		const mcqQuestion = await prisma.question.create({
 			data: {
 				title: "Prisma Multi-File Schema Support",
-				description: "Which Prisma configuration file feature allows organizing schemas across multiple files?",
+				description:
+					"Which Prisma configuration file feature allows organizing schemas across multiple files?",
 				type: "MCQ",
 				difficulty: "EASY",
 				marks: 20,
@@ -91,12 +98,16 @@ async function seed() {
 		const codingQuestion = await prisma.question.create({
 			data: {
 				title: "Implement Global Error Handler",
-				description: "Write an Express error handler that converts Zod validation errors to standardized JSON output.",
+				description:
+					"Write an Express error handler that converts Zod validation errors to standardized JSON output.",
 				type: "CODING",
 				difficulty: "MEDIUM",
 				marks: 80,
 				testCases: [
-					{ input: "{ email: 'invalid' }", expectedOutput: "status 400 with errorSources" },
+					{
+						input: "{ email: 'invalid' }",
+						expectedOutput: "status 400 with errorSources",
+					},
 				],
 			},
 		});
@@ -109,7 +120,8 @@ async function seed() {
 				data: {
 					recruiterId: recruiterUser.recruiterProfile.id,
 					title: "Full-Stack Node.js & Prisma Developer Assessment",
-					description: "Comprehensive technical assessment evaluating Express, TypeScript, and Prisma ORM skills.",
+					description:
+						"Comprehensive technical assessment evaluating Express, TypeScript, and Prisma ORM skills.",
 					durationMinutes: 60,
 					passMarks: 60,
 					totalMarks: 100,

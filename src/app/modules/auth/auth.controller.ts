@@ -36,16 +36,18 @@ export const login = catchAsync(async (req: Request, res: Response) => {
 	});
 });
 
-export const forgotPassword = catchAsync(async (req: Request, res: Response) => {
-	const result = await AuthService.forgotPassword(req.body);
+export const forgotPassword = catchAsync(
+	async (req: Request, res: Response) => {
+		const result = await AuthService.forgotPassword(req.body);
 
-	sendResponse(res, {
-		statusCode: 200,
-		success: true,
-		message: result.message,
-		data: { otp: result.otp },
-	});
-});
+		sendResponse(res, {
+			statusCode: 200,
+			success: true,
+			message: result.message,
+			data: { otp: result.otp },
+		});
+	},
+);
 
 export const resetPassword = catchAsync(async (req: Request, res: Response) => {
 	const result = await AuthService.resetPassword(req.body);

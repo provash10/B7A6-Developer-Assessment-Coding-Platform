@@ -1,5 +1,10 @@
-import type { ErrorRequestHandler, NextFunction, Request, Response } from "express";
 import { Prisma } from "@prisma/client";
+import type {
+	ErrorRequestHandler,
+	NextFunction,
+	Request,
+	Response,
+} from "express";
 import { ZodError } from "zod";
 import config from "../config";
 import AppError from "../utils/AppError";

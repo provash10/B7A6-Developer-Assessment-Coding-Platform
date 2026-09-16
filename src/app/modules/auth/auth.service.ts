@@ -1,22 +1,19 @@
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 import config from "../../config";
 import { googleClient } from "../../lib/googleAuth";
 import { sendEmail } from "../../lib/nodemailer";
 import { prisma } from "../../lib/prisma";
 import AppError from "../../utils/AppError";
-import jwtUtils from "../../utils/jwt";
+import type {
+	IForgotPasswordInput,
+	IGoogleLoginInput,
+	ILoginUserInput,
+	IRegisterUserInput,
+	IResetPasswordInput,
+} from "./auth.interface";
 
-export const registerUser = async (payload: {
-	email: string;
-	password: string;
-	name: string;
-	phone?: string;
-	role?: "ADMIN" | "RECRUITER" | "CANDIDATE";
-	companyName?: string;
-	companyWebsite?: string;
-	skills?: string[];
-	experienceYears?: number;
-}) => {
+export const registerUser = async (payload: IRegisterUserInput) => {
 	const existingUser = await prisma.user.findUnique({
 		where: { email: payload.email },
 	});
@@ -73,16 +70,32 @@ export const registerUser = async (payload: {
 		},
 	}).catch((err) => console.log("Email sending error:", err));
 
-	const accessToken = jwtUtils.createToken(
-		{ userId: result.id, email: result.email, role: result.role },
-		config.jwt.jwt_secret,
-		config.jwt.expires_in,
+	const accessToken = jwt.sign(
+		{
+			id: result.id,
+			userId: result.id,
+			name: result.name,
+			email: result.email,
+			role: result.role,
+		},
+		config.jwt.jwt_secret as string,
+		{
+			expiresIn: config.jwt.expires_in as any,
+		},
 	);
 
-	const refreshToken = jwtUtils.createToken(
-		{ userId: result.id, email: result.email, role: result.role },
-		config.jwt.refresh_token_secret,
-		config.jwt.refresh_token_expires_in,
+	const refreshToken = jwt.sign(
+		{
+			id: result.id,
+			userId: result.id,
+			name: result.name,
+			email: result.email,
+			role: result.role,
+		},
+		config.jwt.refresh_token_secret as string,
+		{
+			expiresIn: config.jwt.refresh_token_expires_in as any,
+		},
 	);
 
 	return {
@@ -97,10 +110,7 @@ export const registerUser = async (payload: {
 	};
 };
 
-export const loginUser = async (payload: {
-	email: string;
-	password: string;
-}) => {
+export const loginUser = async (payload: ILoginUserInput) => {
 	const user = await prisma.user.findUnique({
 		where: { email: payload.email },
 	});
@@ -118,16 +128,32 @@ export const loginUser = async (payload: {
 		throw new AppError(401, "Invalid email or password.");
 	}
 
-	const accessToken = jwtUtils.createToken(
-		{ userId: user.id, email: user.email, role: user.role },
-		config.jwt.jwt_secret,
-		config.jwt.expires_in,
+	const accessToken = jwt.sign(
+		{
+			id: user.id,
+			userId: user.id,
+			name: user.name,
+			email: user.email,
+			role: user.role,
+		},
+		config.jwt.jwt_secret as string,
+		{
+			expiresIn: config.jwt.expires_in as any,
+		},
 	);
 
-	const refreshToken = jwtUtils.createToken(
-		{ userId: user.id, email: user.email, role: user.role },
-		config.jwt.refresh_token_secret,
-		config.jwt.refresh_token_expires_in,
+	const refreshToken = jwt.sign(
+		{
+			id: user.id,
+			userId: user.id,
+			name: user.name,
+			email: user.email,
+			role: user.role,
+		},
+		config.jwt.refresh_token_secret as string,
+		{
+			expiresIn: config.jwt.refresh_token_expires_in as any,
+		},
 	);
 
 	return {
@@ -142,7 +168,7 @@ export const loginUser = async (payload: {
 	};
 };
 
-export const forgotPassword = async (payload: { email: string }) => {
+export const forgotPassword = async (payload: IForgotPasswordInput) => {
 	const user = await prisma.user.findUnique({
 		where: { email: payload.email },
 	});
@@ -167,11 +193,7 @@ export const forgotPassword = async (payload: { email: string }) => {
 	return { message: "Password reset OTP has been sent to your email.", otp };
 };
 
-export const resetPassword = async (payload: {
-	email: string;
-	otp: string;
-	newPassword: string;
-}) => {
+export const resetPassword = async (payload: IResetPasswordInput) => {
 	const user = await prisma.user.findUnique({
 		where: { email: payload.email },
 	});
@@ -197,7 +219,7 @@ export const resetPassword = async (payload: {
 	return { message: "Password reset completed successfully." };
 };
 
-export const googleLogin = async (payload: { idToken: string }) => {
+export const googleLogin = async (payload: IGoogleLoginInput) => {
 	const ticket = await googleClient.verifyIdToken({
 		idToken: payload.idToken,
 		audience: config.google_client_id,
@@ -229,16 +251,32 @@ export const googleLogin = async (payload: { idToken: string }) => {
 		});
 	}
 
-	const accessToken = jwtUtils.createToken(
-		{ userId: user.id, email: user.email, role: user.role },
-		config.jwt.jwt_secret,
-		config.jwt.expires_in,
+	const accessToken = jwt.sign(
+		{
+			id: user.id,
+			userId: user.id,
+			name: user.name,
+			email: user.email,
+			role: user.role,
+		},
+		config.jwt.jwt_secret as string,
+		{
+			expiresIn: config.jwt.expires_in as any,
+		},
 	);
 
-	const refreshToken = jwtUtils.createToken(
-		{ userId: user.id, email: user.email, role: user.role },
-		config.jwt.refresh_token_secret,
-		config.jwt.refresh_token_expires_in,
+	const refreshToken = jwt.sign(
+		{
+			id: user.id,
+			userId: user.id,
+			name: user.name,
+			email: user.email,
+			role: user.role,
+		},
+		config.jwt.refresh_token_secret as string,
+		{
+			expiresIn: config.jwt.refresh_token_expires_in as any,
+		},
 	);
 
 	return {

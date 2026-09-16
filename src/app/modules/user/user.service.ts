@@ -1,6 +1,7 @@
 import type { UserRole } from "@prisma/client";
 import { prisma } from "../../lib/prisma";
 import AppError from "../../utils/AppError";
+import type { IUpdateProfileInput, IUserFilterParams } from "./user.interface";
 
 export const getMyProfile = async (userId: string) => {
 	const user = await prisma.user.findUnique({
@@ -21,15 +22,7 @@ export const getMyProfile = async (userId: string) => {
 
 export const updateMyProfile = async (
 	userId: string,
-	payload: {
-		name?: string;
-		phone?: string;
-		companyName?: string;
-		companyWebsite?: string;
-		resumeUrl?: string;
-		skills?: string[];
-		experienceYears?: number;
-	},
+	payload: IUpdateProfileInput,
 ) => {
 	const user = await prisma.user.findUnique({
 		where: { id: userId },
@@ -57,7 +50,8 @@ export const updateMyProfile = async (
 				where: { id: user.recruiterProfile.id },
 				data: {
 					companyName: payload.companyName ?? user.recruiterProfile.companyName,
-					companyWebsite: payload.companyWebsite ?? user.recruiterProfile.companyWebsite,
+					companyWebsite:
+						payload.companyWebsite ?? user.recruiterProfile.companyWebsite,
 				},
 			});
 		} else if (user.role === "CANDIDATE" && user.candidateProfile) {
@@ -66,7 +60,8 @@ export const updateMyProfile = async (
 				data: {
 					resumeUrl: payload.resumeUrl ?? user.candidateProfile.resumeUrl,
 					skills: payload.skills ?? user.candidateProfile.skills,
-					experienceYears: payload.experienceYears ?? user.candidateProfile.experienceYears,
+					experienceYears:
+						payload.experienceYears ?? user.candidateProfile.experienceYears,
 				},
 			});
 		}
@@ -78,11 +73,7 @@ export const updateMyProfile = async (
 	return getMyProfile(updatedUser.id);
 };
 
-export const getAllUsers = async (query: {
-	role?: UserRole;
-	page?: number;
-	limit?: number;
-}) => {
+export const getAllUsers = async (query: IUserFilterParams) => {
 	const page = Number(query.page) || 1;
 	const limit = Number(query.limit) || 10;
 	const skip = (page - 1) * limit;

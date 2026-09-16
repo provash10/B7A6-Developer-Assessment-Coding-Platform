@@ -1,4 +1,8 @@
-import jwt, { type JwtPayload, type Secret, type SignOptions } from "jsonwebtoken";
+import jwt, {
+	type JwtPayload,
+	type Secret,
+	type SignOptions,
+} from "jsonwebtoken";
 
 export const createToken = (
 	payload: Record<string, unknown>,
@@ -12,7 +16,10 @@ export const createToken = (
 	return token;
 };
 
-export const verifyToken = (token: string, secret: Secret): JwtPayload | string => {
+export const verifyToken = (
+	token: string,
+	secret: Secret,
+): JwtPayload | string => {
 	try {
 		return jwt.verify(token, secret);
 	} catch (error: any) {

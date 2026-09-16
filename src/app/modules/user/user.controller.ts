@@ -16,17 +16,19 @@ export const getMyProfile = catchAsync(async (req: Request, res: Response) => {
 	});
 });
 
-export const updateMyProfile = catchAsync(async (req: Request, res: Response) => {
-	const userId = req.user?.userId as string;
-	const result = await UserService.updateMyProfile(userId, req.body);
+export const updateMyProfile = catchAsync(
+	async (req: Request, res: Response) => {
+		const userId = req.user?.userId as string;
+		const result = await UserService.updateMyProfile(userId, req.body);
 
-	sendResponse(res, {
-		statusCode: 200,
-		success: true,
-		message: "User profile updated successfully",
-		data: result,
-	});
-});
+		sendResponse(res, {
+			statusCode: 200,
+			success: true,
+			message: "User profile updated successfully",
+			data: result,
+		});
+	},
+);
 
 export const getAllUsers = catchAsync(async (req: Request, res: Response) => {
 	const result = await UserService.getAllUsers(req.query);
@@ -40,18 +42,20 @@ export const getAllUsers = catchAsync(async (req: Request, res: Response) => {
 	});
 });
 
-export const updateUserRole = catchAsync(async (req: Request, res: Response) => {
-	const { id } = req.params;
-	const { role } = req.body;
-	const result = await UserService.updateUserRole(id as string, role);
+export const updateUserRole = catchAsync(
+	async (req: Request, res: Response) => {
+		const { id } = req.params;
+		const { role } = req.body;
+		const result = await UserService.updateUserRole(id as string, role);
 
-	sendResponse(res, {
-		statusCode: 200,
-		success: true,
-		message: "User role updated successfully",
-		data: result,
-	});
-});
+		sendResponse(res, {
+			statusCode: 200,
+			success: true,
+			message: "User role updated successfully",
+			data: result,
+		});
+	},
+);
 
 export const UserController = {
 	getMyProfile,
