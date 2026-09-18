@@ -1,7 +1,12 @@
+import type { UserRole } from "@prisma/client";
 import { prisma } from "../../lib/prisma";
 import AppError from "../../utils/AppError";
 import type {
+	IAntiCheatResponse,
+	IAttemptResultResponse,
 	IExamQuestionsResponse,
+	IFinishAttemptResponse,
+	IQuestionResultDetail,
 	ISanitizedQuestion,
 	IStartAttemptResponse,
 	ISubmitAnswerInput,
@@ -394,7 +399,7 @@ export const submitAnswer = async (
 								.trim()
 								.toLowerCase();
 					} else {
-						// fallback: if options is simple string array, compare directly with the first option
+						// fallback: if options is simple string array, compare directly with first option
 						const firstOption = String(question.options[0])
 							.trim()
 							.toLowerCase();
@@ -470,8 +475,325 @@ export const submitAnswer = async (
 	};
 };
 
+export const recordAntiCheatFlag = async (
+	attemptId: string,
+	userId: string,
+): Promise<IAntiCheatResponse> => {
+	const candidateProfile = await prisma.candidateProfile.findUnique({
+		where: { userId },
+	});
+
+	if (!candidateProfile) {
+		throw new AppError(404, "Candidate profile not found.");
+	}
+
+	const attempt = await prisma.candidateAttempt.findFirst({
+		where: {
+			id: attemptId,
+			deletedAt: null,
+		},
+	});
+
+	if (!attempt) {
+		throw new AppError(404, "Assessment attempt not found.");
+	}
+
+	if (attempt.candidateId !== candidateProfile.id) {
+		throw new AppError(
+			403,
+			"You are not authorized to record anti-cheat flags for this attempt.",
+		);
+	}
+
+	if (attempt.status !== "IN_PROGRESS") {
+		throw new AppError(
+			400,
+			"Cannot log anti-cheat flags when attempt is not in progress.",
+		);
+	}
+
+	const updatedAttempt = await prisma.candidateAttempt.update({
+		where: { id: attemptId },
+		data: {
+			antiCheatFlags: {
+				increment: 1,
+			},
+		},
+	});
+
+	return {
+		attemptId: updatedAttempt.id,
+		antiCheatFlags: updatedAttempt.antiCheatFlags,
+		message: `Anti-cheat flag logged. Total flags: ${updatedAttempt.antiCheatFlags}. Please keep your browser window focused during the exam.`,
+	};
+};
+
+export const finishAttempt = async (
+	attemptId: string,
+	userId: string,
+): Promise<IFinishAttemptResponse> => {
+	const candidateProfile = await prisma.candidateProfile.findUnique({
+		where: { userId },
+	});
+
+	if (!candidateProfile) {
+		throw new AppError(404, "Candidate profile not found.");
+	}
+
+	const attempt = await prisma.candidateAttempt.findFirst({
+		where: {
+			id: attemptId,
+			deletedAt: null,
+		},
+		include: {
+			assessment: true,
+			submissions: true,
+		},
+	});
+
+	if (!attempt) {
+		throw new AppError(404, "Assessment attempt not found.");
+	}
+
+	if (attempt.candidateId !== candidateProfile.id) {
+		throw new AppError(
+			403,
+			"You are not authorized to finish this attempt.",
+		);
+	}
+
+	// if already submitted, calculate and return existing result
+	if (attempt.status === "SUBMITTED") {
+		const totalMarks = attempt.assessment.totalMarks || 100;
+		const percentage =
+			totalMarks > 0
+				? Number(((attempt.totalScore / totalMarks) * 100).toFixed(2))
+				: 0;
+
+		return {
+			attemptId: attempt.id,
+			assessmentId: attempt.assessment.id,
+			assessmentTitle: attempt.assessment.title,
+			status: attempt.status,
+			startedAt: attempt.startedAt,
+			submittedAt: attempt.submittedAt || new Date(),
+			totalScore: attempt.totalScore,
+			totalMarks,
+			passMarks: attempt.assessment.passMarks,
+			percentage,
+			isPassed: attempt.isPassed,
+			antiCheatFlags: attempt.antiCheatFlags,
+		};
+	}
+
+	if (attempt.status !== "IN_PROGRESS") {
+		throw new AppError(
+			400,
+			`Cannot finish an attempt with status: ${attempt.status}`,
+		);
+	}
+
+	// calculate total score from all candidate submissions
+	const submissions = await prisma.submission.findMany({
+		where: { attemptId },
+	});
+
+	const totalScore = submissions.reduce(
+		(sum, sub) => sum + (sub.scoreObtained || 0),
+		0,
+	);
+	const passMarks = attempt.assessment.passMarks;
+	const isPassed = totalScore >= passMarks;
+	const totalMarks = attempt.assessment.totalMarks || 100;
+	const percentage =
+		totalMarks > 0
+			? Number(((totalScore / totalMarks) * 100).toFixed(2))
+			: 0;
+	const submittedAt = new Date();
+
+	// finalize candidate attempt
+	const finalizedAttempt = await prisma.candidateAttempt.update({
+		where: { id: attemptId },
+		data: {
+			status: "SUBMITTED",
+			submittedAt,
+			totalScore,
+			isPassed,
+		},
+	});
+
+	return {
+		attemptId: finalizedAttempt.id,
+		assessmentId: attempt.assessment.id,
+		assessmentTitle: attempt.assessment.title,
+		status: finalizedAttempt.status,
+		startedAt: finalizedAttempt.startedAt,
+		submittedAt,
+		totalScore: finalizedAttempt.totalScore,
+		totalMarks,
+		passMarks,
+		percentage,
+		isPassed: finalizedAttempt.isPassed,
+		antiCheatFlags: finalizedAttempt.antiCheatFlags,
+	};
+};
+
+export const getAttemptResult = async (
+	attemptId: string,
+	userId: string,
+	userRole: UserRole,
+): Promise<IAttemptResultResponse> => {
+	const attempt = await prisma.candidateAttempt.findFirst({
+		where: {
+			id: attemptId,
+			deletedAt: null,
+		},
+		include: {
+			assessment: {
+				include: {
+					assessmentQuestions: {
+						where: {
+							question: {
+								deletedAt: null,
+							},
+						},
+						orderBy: {
+							orderIndex: "asc",
+						},
+						include: {
+							question: true,
+						},
+					},
+				},
+			},
+			candidate: {
+				include: {
+					user: {
+						select: {
+							id: true,
+							name: true,
+							email: true,
+						},
+					},
+				},
+			},
+			submissions: true,
+		},
+	});
+
+	if (!attempt) {
+		throw new AppError(404, "Assessment attempt not found.");
+	}
+
+	// role-based scoping
+	if (userRole === "CANDIDATE") {
+		const candidateProfile = await prisma.candidateProfile.findUnique({
+			where: { userId },
+		});
+		if (!candidateProfile || attempt.candidateId !== candidateProfile.id) {
+			throw new AppError(
+				403,
+				"You are not authorized to view results for this attempt.",
+			);
+		}
+	} else if (userRole === "RECRUITER") {
+		const recruiterProfile = await prisma.recruiterProfile.findUnique({
+			where: { userId },
+		});
+		if (
+			!recruiterProfile ||
+			attempt.assessment.recruiterId !== recruiterProfile.id
+		) {
+			throw new AppError(
+				403,
+				"You are not authorized to view results for this assessment.",
+			);
+		}
+	}
+	// ADMIN has unrestricted view
+
+	if (attempt.status !== "SUBMITTED") {
+		throw new AppError(
+			400,
+			"Assessment has not been finalized yet. Results are available only after submission.",
+		);
+	}
+
+	// calculate duration in minutes
+	let durationTakenMinutes = 0;
+	if (attempt.startedAt && attempt.submittedAt) {
+		durationTakenMinutes = Math.max(
+			1,
+			Math.round(
+				(attempt.submittedAt.getTime() - attempt.startedAt.getTime()) /
+					(1000 * 60),
+			),
+		);
+	}
+
+	const totalMarks = attempt.assessment.totalMarks || 100;
+	const percentage =
+		totalMarks > 0
+			? Number(((attempt.totalScore / totalMarks) * 100).toFixed(2))
+			: 0;
+
+	// map question-level results
+	const questionSubmissions: IQuestionResultDetail[] =
+		attempt.assessment.assessmentQuestions.map((aq) => {
+			const q = aq.question;
+			const sub = attempt.submissions.find((s) => s.questionId === q.id);
+
+			return {
+				questionId: q.id,
+				orderIndex: aq.orderIndex,
+				title: q.title,
+				type: q.type,
+				maxMarks: q.marks,
+				scoreObtained: sub?.scoreObtained ?? 0,
+				verdict: sub?.verdict ?? "NOT_ANSWERED",
+				selectedOption: sub?.selectedOption ?? null,
+				submittedCode: sub?.submittedCode ?? null,
+				executionTime: sub?.executionTime ?? null,
+			};
+		});
+
+	return {
+		attemptId: attempt.id,
+		status: attempt.status,
+		candidate: {
+			id: attempt.candidate.id,
+			name: attempt.candidate.user.name,
+			email: attempt.candidate.user.email,
+		},
+		assessment: {
+			id: attempt.assessment.id,
+			title: attempt.assessment.title,
+			description: attempt.assessment.description,
+			durationMinutes: attempt.assessment.durationMinutes,
+			totalMarks,
+			passMarks: attempt.assessment.passMarks,
+		},
+		summary: {
+			startedAt: attempt.startedAt,
+			submittedAt: attempt.submittedAt,
+			durationTakenMinutes,
+			totalScore: attempt.totalScore,
+			percentage,
+			isPassed: attempt.isPassed,
+			antiCheatFlags: attempt.antiCheatFlags,
+			totalAnsweredQuestions: attempt.submissions.length,
+			totalAssessmentQuestions:
+				attempt.assessment.assessmentQuestions.length,
+		},
+		submissions: questionSubmissions,
+	};
+};
+
 export const AttemptService = {
 	startAttempt,
 	getAttemptQuestions,
 	submitAnswer,
+	recordAntiCheatFlag,
+	finishAttempt,
+	getAttemptResult,
 };

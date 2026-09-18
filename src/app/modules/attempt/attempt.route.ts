@@ -28,4 +28,25 @@ router.post(
 	AttemptController.submitAnswer,
 );
 
+// Candidate records an anti-cheat event (e.g. Tab switch / window blur)
+router.post(
+	"/:id/anti-cheat",
+	checkAuth("CANDIDATE"),
+	AttemptController.recordAntiCheatFlag,
+);
+
+// Candidate finishes assessment and calculates final score
+router.post(
+	"/:id/finish",
+	checkAuth("CANDIDATE"),
+	AttemptController.finishAttempt,
+);
+
+// View assessment attempt result (Candidate self, assessment Recruiter, or Admin)
+router.get(
+	"/:id/result",
+	checkAuth("CANDIDATE", "RECRUITER", "ADMIN"),
+	AttemptController.getAttemptResult,
+);
+
 export const AttemptRoutes = router;
