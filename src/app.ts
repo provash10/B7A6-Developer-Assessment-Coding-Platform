@@ -12,6 +12,7 @@ import { AssessmentRoutes } from "./app/modules/assessment/assessment.route";
 import { AttemptRoutes } from "./app/modules/attempt/attempt.route";
 import { AuthRoutes } from "./app/modules/auth/auth.route";
 import { InvitationRoutes } from "./app/modules/invitation/invitation.route";
+import { PaymentRoutes } from "./app/modules/payment/payment.route";
 import { QuestionRoutes } from "./app/modules/question/question.route";
 import { UserRoutes } from "./app/modules/user/user.route";
 
@@ -42,6 +43,7 @@ app.use("/api/v1/questions", QuestionRoutes);
 app.use("/api/v1/assessments", AssessmentRoutes);
 app.use("/api/v1/invitations", InvitationRoutes);
 app.use("/api/v1/attempts", AttemptRoutes);
+app.use("/api/v1/payments", PaymentRoutes);
 
 // root route
 app.get("/", async (_req: Request, res: Response) => {

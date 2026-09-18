@@ -20,4 +20,16 @@ export default {
 	},
 	google_client_id: process.env.GOOGLE_CLIENT_ID || "",
 	frontend_url: process.env.FRONTEND_URL || "http://localhost:3000",
+	bkash: {
+		base_url:
+			process.env.BKASH_BASE_URL ||
+			"https://tokenized.sandbox.bka.sh/v1.2.0-beta",
+		username: process.env.BKASH_USERNAME || "",
+		password: process.env.BKASH_PASSWORD || "",
+		app_key: process.env.BKASH_APP_KEY || "",
+		app_secret: process.env.BKASH_APP_SECRET || "",
+		callback_url:
+			process.env.BKASH_CALLBACK_URL ||
+			"http://localhost:5000/api/v1/payments/callback",
+	},
 };

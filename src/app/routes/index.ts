@@ -3,6 +3,7 @@ import { AssessmentRoutes } from "../modules/assessment/assessment.route";
 import { AttemptRoutes } from "../modules/attempt/attempt.route";
 import { AuthRoutes } from "../modules/auth/auth.route";
 import { InvitationRoutes } from "../modules/invitation/invitation.route";
+import { PaymentRoutes } from "../modules/payment/payment.route";
 import { QuestionRoutes } from "../modules/question/question.route";
 import { UserRoutes } from "../modules/user/user.route";
 
@@ -34,6 +35,10 @@ const moduleRoutes: { path: string; route: any }[] = [
 	{
 		path: "/attempts",
 		route: AttemptRoutes,
+	},
+	{
+		path: "/payments",
+		route: PaymentRoutes,
 	},
 ];
 
