@@ -1,0 +1,213 @@
+{
+  "info": {
+    "_postman_id": "c9e56218-3b15-4fa7-9cd1-8e4a921d7202",
+    "name": "A6 - Payment Integration (bKash & Credits)",
+    "description": "Postman collection covering all 5 steps of bKash Payment Integration, Credit Purchase, Callback handling, and Transaction History.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Check bKash Token",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{recruiter_token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/v1/payments/bkash-token",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "payments",
+            "bkash-token"
+          ]
+        },
+        "description": "Tests connectivity with bKash Sandbox and returns a valid cached id_token."
+      },
+      "response": []
+    },
+    {
+      "name": "2. Initiate Payment (Buy Credits)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{recruiter_token}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"credits\": 100\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/payments/initiate",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "payments",
+            "initiate"
+          ]
+        },
+        "description": "Initiates bKash payment to purchase assessment credits (1 Credit = 5 BDT). Returns paymentUrl (bkashURL)."
+      },
+      "response": []
+    },
+    {
+      "name": "3. bKash Callback / Webhook",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/v1/payments/callback?paymentID=YOUR_PAYMENT_ID&status=success",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "payments",
+            "callback"
+          ],
+          "query": [
+            {
+              "key": "paymentID",
+              "value": "YOUR_PAYMENT_ID",
+              "description": "bKash paymentID returned from initiate step"
+            },
+            {
+              "key": "status",
+              "value": "success",
+              "description": "success, failure, or cancel"
+            }
+          ]
+        },
+        "description": "Callback endpoint called by bKash upon payment completion. Executes payment and adds credits to recruiter profile."
+      },
+      "response": []
+    },
+    {
+      "name": "4. Get My Transactions",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{recruiter_token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/v1/payments/my-transactions?page=1&limit=10",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "payments",
+            "my-transactions"
+          ],
+          "query": [
+            {
+              "key": "page",
+              "value": "1"
+            },
+            {
+              "key": "limit",
+              "value": "10"
+            }
+          ]
+        },
+        "description": "Returns paginated list of all payments made by logged-in recruiter."
+      },
+      "response": []
+    },
+    {
+      "name": "5. Get Single Transaction / Invoice",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{recruiter_token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/v1/payments/:id",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "payments",
+            ":id"
+          ],
+          "variable": [
+            {
+              "key": "id",
+              "value": "YOUR_TRANSACTION_ID_OR_PAYMENT_ID"
+            }
+          ]
+        },
+        "description": "Returns detailed invoice and receipt for a specific payment transaction."
+      },
+      "response": []
+    },
+    {
+      "name": "6. Admin - Get All Platform Transactions",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{admin_token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/v1/payments/all-transactions?page=1&limit=10",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "payments",
+            "all-transactions"
+          ],
+          "query": [
+            {
+              "key": "page",
+              "value": "1"
+            },
+            {
+              "key": "limit",
+              "value": "10"
+            }
+          ]
+        },
+        "description": "Admin endpoint returning all transactions across the platform with user details."
+      },
+      "response": []
+    }
+  ]
+}

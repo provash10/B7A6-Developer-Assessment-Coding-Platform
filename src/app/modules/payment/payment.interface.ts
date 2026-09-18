@@ -9,12 +9,30 @@ export interface IBkashTokenResponse {
 
 export interface IInitiatePaymentPayload {
 	credits: number;
-	amount?: number;
+}
+
+export interface IInitiatePaymentResponse {
+	transactionId: string;
+	paymentUrl: string;
+	amount: number;
+	currency: string;
+	credits: number;
+	status: string;
 }
 
 export interface IPaymentCallbackQuery {
 	paymentID?: string;
 	status?: "success" | "failure" | "cancel" | string;
+}
+
+export interface IExecutePaymentResponse {
+	transactionId: string;
+	status: string;
+	message: string;
+	creditsPurchased?: number;
+	newTotalCredits?: number;
+	trxID?: string;
+	amount?: number;
 }
 
 export interface IPaymentFilterParams {
