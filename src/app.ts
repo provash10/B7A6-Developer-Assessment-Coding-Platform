@@ -9,6 +9,7 @@ import config from "./app/config";
 import { globalErrorHandler } from "./app/middleware/globalErrorHandler";
 import { notFound } from "./app/middleware/notFound";
 import { AssessmentRoutes } from "./app/modules/assessment/assessment.route";
+import { AttemptRoutes } from "./app/modules/attempt/attempt.route";
 import { AuthRoutes } from "./app/modules/auth/auth.route";
 import { InvitationRoutes } from "./app/modules/invitation/invitation.route";
 import { QuestionRoutes } from "./app/modules/question/question.route";
@@ -40,6 +41,7 @@ app.use("/api/v1/users", UserRoutes);
 app.use("/api/v1/questions", QuestionRoutes);
 app.use("/api/v1/assessments", AssessmentRoutes);
 app.use("/api/v1/invitations", InvitationRoutes);
+app.use("/api/v1/attempts", AttemptRoutes);
 
 // root route
 app.get("/", async (_req: Request, res: Response) => {
