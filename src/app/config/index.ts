@@ -19,4 +19,5 @@ export default {
 		from: process.env.EMAIL_FROM || "no-reply@assessmentplatform.com",
 	},
 	google_client_id: process.env.GOOGLE_CLIENT_ID || "",
+	frontend_url: process.env.FRONTEND_URL || "http://localhost:3000",
 };

@@ -5,34 +5,53 @@ import express, {
 	type Request,
 	type Response,
 } from "express";
-import globalErrorHandler from "./app/middleware/globalErrorHandler";
-import notFound from "./app/middleware/notFound";
-import router from "./app/routes";
+import config from "./app/config";
+import { globalErrorHandler } from "./app/middleware/globalErrorHandler";
+import { notFound } from "./app/middleware/notFound";
+import { AssessmentRoutes } from "./app/modules/assessment/assessment.route";
+import { AuthRoutes } from "./app/modules/auth/auth.route";
+import { InvitationRoutes } from "./app/modules/invitation/invitation.route";
+import { QuestionRoutes } from "./app/modules/question/question.route";
+import { UserRoutes } from "./app/modules/user/user.route";
 
 const app: Application = express();
 
-// Parsers
-app.use(cors());
-app.use(cookieParser());
-// Middleware to parse JSON bodies
-app.use(express.json());
-// Enable URL-encoded form data parsing
+// console.log("initializing express application setup");
+
+// cors middleware configuration
+app.use(
+	cors({
+		origin: config.frontend_url,
+		credentials: true,
+	}),
+);
+
+// enable url-encoded form data parsing
 app.use(express.urlencoded({ extended: true }));
 
-// Application Routes
-app.use("/api/v1", router);
+// middleware to parse json bodies
+app.use(express.json());
+app.use(cookieParser());
 
-// Basic route
-app.get("/", (_req: Request, res: Response) => {
-	res.send({
-		message: "Developer Assessment Coding Platform API Server is Running!",
+// application module routes mounted directly
+// console.log("mounting application routes directly");
+app.use("/api/v1/auth", AuthRoutes);
+app.use("/api/v1/users", UserRoutes);
+app.use("/api/v1/questions", QuestionRoutes);
+app.use("/api/v1/assessments", AssessmentRoutes);
+app.use("/api/v1/invitations", InvitationRoutes);
+
+// root route
+app.get("/", async (_req: Request, res: Response) => {
+	// console.log("root endpoint hit");
+	res.status(200).json({
+		success: true,
+		message: "Welcome to Developer Assessment Coding Platform Backend",
 	});
 });
 
-// Not Found Handler
-app.use(notFound);
-
-// Global Error Handler
+// global error handler and not found handler
 app.use(globalErrorHandler);
+app.use(notFound);
 
 export default app;
