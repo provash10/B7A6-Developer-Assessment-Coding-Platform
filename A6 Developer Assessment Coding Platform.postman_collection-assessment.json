@@ -1,0 +1,655 @@
+{
+  "info": {
+    "_postman_id": "a8c23608-090b-494a-aeb1-9e6fac170e20",
+    "name": "A6 Developer Assessment Coding Platform",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "45096706",
+    "_collection_link": "https://go.postman.co/collection/45096706-a8c23608-090b-494a-aeb1-9e6fac170e20?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "User",
+      "item": [
+        {
+          "name": "Get My Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": ""
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:5000/api/v1/users/me",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "me"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{json_web_token_0jqw}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"role\": \"RECRUITER\"\r\n}\r\n    ",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/v1/users/9ec24788-1fc7-4e2b-9448-ee4a18108a86/role",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "9ec24788-1fc7-4e2b-9448-ee4a18108a86",
+                "role"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "",
+                "value": ""
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\" :\"recruiter-1@100.com\",\n  \"password\": \"Password@100\"\n    \n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/v1/auth/login",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Admin-2\",\r\n  \"email\": \"admin-1@100.com\",\r\n  \"password\": \"Password@100\",\r\n  \"phone\": \"+8801700001111\",\r\n  \"role\": \"ADMIN\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/v1/auth/register",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Question",
+      "item": [
+        {
+          "name": "Create Question",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{bearer_token_0cjl}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"title\": \"Reverse a String\",\r\n  \"description\": \"Write a function to reverse a string in-place.\",\r\n  \"type\": \"CODING\",\r\n  \"difficulty\": \"EASY\",\r\n  \"marks\": 15,\r\n  \"testCases\": [\r\n    {\r\n      \"input\": \"hello\",\r\n      \"expectedOutput\": \"olleh\",\r\n      \"isHidden\": false\r\n    }\r\n  ]\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/v1/questions",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "v1",
+                "questions"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Questions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/v1/questions/?page=1&limit=10&searchTerm=Reverse&type=CODING&difficulty=EASY",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "v1",
+                "questions",
+                ""
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "searchTerm",
+                  "value": "Reverse"
+                },
+                {
+                  "key": "type",
+                  "value": "CODING"
+                },
+                {
+                  "key": "difficulty",
+                  "value": "EASY"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Single Question",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": ""
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:5000/api/v1/questions/1ce1bf71-9d79-4a36-9b4c-c7a5f808d8d8",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "v1",
+                "questions",
+                "1ce1bf71-9d79-4a36-9b4c-c7a5f808d8d8"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Question",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{bearer_token_07eq}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"title\": \"Reverse a String - Updated Title\",\r\n  \"difficulty\": \"MEDIUM\",\r\n  \"marks\": 20\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/v1/questions/1ce1bf71-9d79-4a36-9b4c-c7a5f808d8d8",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "v1",
+                "questions",
+                "1ce1bf71-9d79-4a36-9b4c-c7a5f808d8d8"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Question",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{bearer_token_07eq}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:5000/api/v1/questions/1ce1bf71-9d79-4a36-9b4c-c7a5f808d8d8",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "v1",
+                "questions",
+                "1ce1bf71-9d79-4a36-9b4c-c7a5f808d8d8"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "auth": {
+        "type": "apikey",
+        "apikey": [
+          {
+            "key": "key",
+            "value": "Author",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Assessment",
+      "item": [
+        {
+          "name": "Create Assessment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "BearereyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjE0OTJlN2Y4LWI3M2YtNDFiMC1hZTg1LTMzY2U5ZTVmNWU1OSIsInVzZXJJZCI6IjE0OTJlN2Y4LWI3M2YtNDFiMC1hZTg1LTMzY2U5ZTVmNWU1OSIsIm5hbWUiOiJSZWNydWl0ZXItMSIsImVtYWlsIjoicmVjcnVpdGVyLTFAMTAwLmNvbSIsInJvbGUiOiJSRUNSVUlURVIiLCJpYXQiOjE3ODk2Mjk5ODAsImV4cCI6MTc5MDIzNDc4MH0.GEWUsWwoXLxaGaOV8ESQ9KG6HQtagdXXI1M2JDVHquA"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"title\": \"Full Stack Node.js Assessment\",\r\n  \"description\": \"Technical evaluation for Full Stack Developer role\",\r\n  \"durationMinutes\": 60,\r\n  \"passMarks\": 70,\r\n  \"startTime\": \"2026-09-20T10:00:00.000Z\",\r\n  \"endTime\": \"2026-09-20T12:00:00.000Z\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/v1/assessments",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "v1",
+                "assessments"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Assessment",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "page",
+                "value": "1"
+              },
+              {
+                "key": "limit",
+                "value": "10"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer "
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:5000/api/v1/assessments",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "v1",
+                "assessments"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Single Assessment",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:5000/api/v1/assessments/646b86c5-1bd3-490d-8daa-0bb2cc08037f",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "v1",
+                "assessments",
+                "646b86c5-1bd3-490d-8daa-0bb2cc08037f"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Assessment",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{json_web_token_13jv}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"title\": \"Updated Node.js Assessment Title 2026\",\r\n  \"status\": \"DRAFT\",\r\n  \"passMarks\": 75\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/v1/assessments/646b86c5-1bd3-490d-8daa-0bb2cc08037f",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "v1",
+                "assessments",
+                "646b86c5-1bd3-490d-8daa-0bb2cc08037f"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add Question to Assessment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{json_web_token_13jv}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"questionId\": \"a9643d85-5361-471c-b0f2-ec4503cc3f2b\",\r\n  \"orderIndex\": 1\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/v1/assessments/646b86c5-1bd3-490d-8daa-0bb2cc08037f/questions",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "v1",
+                "assessments",
+                "646b86c5-1bd3-490d-8daa-0bb2cc08037f",
+                "questions"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Remove Question from Assessment",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer "
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/v1/assessments/646b86c5-1bd3-490d-8daa-0bb2cc08037f/questions/a9643d85-5361-471c-b0f2-ec4503cc3f2b",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "v1",
+                "assessments",
+                "646b86c5-1bd3-490d-8daa-0bb2cc08037f",
+                "questions",
+                "a9643d85-5361-471c-b0f2-ec4503cc3f2b"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Assessment",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{json_web_token_13jv}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:5000/api/v1/assessments/646b86c5-1bd3-490d-8daa-0bb2cc08037f",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "v1",
+                "assessments",
+                "646b86c5-1bd3-490d-8daa-0bb2cc08037f"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "json_web_token_08ka",
+      "secret": true
+    },
+    {
+      "key": "bearer_token_004n",
+      "secret": true
+    },
+    {
+      "key": "json_web_token_1dow",
+      "secret": true
+    },
+    {
+      "key": "bearer_token_0y6w",
+      "secret": true
+    },
+    {
+      "key": "bearer_token_0pyg",
+      "secret": true
+    },
+    {
+      "key": "json_web_token_09rz",
+      "secret": true
+    },
+    {
+      "key": "json_web_token_0jqw",
+      "secret": true
+    },
+    {
+      "key": "bearer_token_0ut6",
+      "secret": true
+    },
+    {
+      "key": "bearer_token_0cjl",
+      "secret": true
+    },
+    {
+      "key": "json_web_token_1bun",
+      "secret": true
+    },
+    {
+      "key": "json_web_token_03u0",
+      "secret": true
+    },
+    {
+      "key": "bearer_token_07eq",
+      "secret": true
+    },
+    {
+      "key": "bearer_token_10xj",
+      "secret": true
+    },
+    {
+      "key": "bearer_token_0fvn",
+      "secret": true
+    },
+    {
+      "key": "json_web_token_13jv",
+      "secret": true
+    }
+  ]
+}
