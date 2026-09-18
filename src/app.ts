@@ -8,6 +8,7 @@ import express, {
 import config from "./app/config";
 import { globalErrorHandler } from "./app/middleware/globalErrorHandler";
 import { notFound } from "./app/middleware/notFound";
+import { AdminRoutes } from "./app/modules/admin/admin.route";
 import { AssessmentRoutes } from "./app/modules/assessment/assessment.route";
 import { AttemptRoutes } from "./app/modules/attempt/attempt.route";
 import { AuthRoutes } from "./app/modules/auth/auth.route";
@@ -44,6 +45,7 @@ app.use("/api/v1/assessments", AssessmentRoutes);
 app.use("/api/v1/invitations", InvitationRoutes);
 app.use("/api/v1/attempts", AttemptRoutes);
 app.use("/api/v1/payments", PaymentRoutes);
+app.use("/api/v1/admin", AdminRoutes);
 
 // root route
 app.get("/", async (_req: Request, res: Response) => {
