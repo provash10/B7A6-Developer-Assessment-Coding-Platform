@@ -586,6 +586,72 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "Leaderboard",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{bearer_token_02wu}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:5000/api/v1/assessments/a4ab30ab-08a5-403d-b405-a3c0c71dd84c/leaderboard?page=1&limit=10",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "v1",
+                "assessments",
+                "a4ab30ab-08a5-403d-b405-a3c0c71dd84c",
+                "leaderboard"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Analytics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{bearer_token_02wu}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:5000/api/v1/assessments/62d9d7cc-f03d-42c4-9f5b-7ff726f553e8/analytics",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "v1",
+                "assessments",
+                "62d9d7cc-f03d-42c4-9f5b-7ff726f553e8",
+                "analytics"
+              ]
+            }
+          },
+          "response": []
         }
       ]
     },

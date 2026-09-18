@@ -3,8 +3,10 @@ import { prisma } from "../../lib/prisma";
 import AppError from "../../utils/AppError";
 import type {
 	IAddQuestionToAssessmentInput,
+	IAssessmentAnalytics,
 	IAssessmentFilterParams,
 	ICreateAssessmentInput,
+	ILeaderboardEntry,
 	IUpdateAssessmentInput,
 } from "./assessment.interface";
 
@@ -418,6 +420,205 @@ export const deleteAssessment = async (id: string) => {
 	return deletedAssessment;
 };
 
+export const getAssessmentLeaderboard = async (
+	assessmentId: string,
+	userId: string,
+	userRole: string,
+	query: { page?: number; limit?: number },
+) => {
+	// verify assessment existence
+	// console.log("checking assessment existence for leaderboard");
+	const assessment = await prisma.assessment.findFirst({
+		where: { id: assessmentId, deletedAt: null },
+	});
+
+	if (!assessment) {
+		throw new AppError(404, "Assessment not found.");
+	}
+
+	// verify recruiter ownership if not admin
+	// console.log("verifying recruiter authorization");
+	if (userRole !== "ADMIN") {
+		const recruiterProfile = await prisma.recruiterProfile.findUnique({
+			where: { userId },
+		});
+		if (!recruiterProfile || assessment.recruiterId !== recruiterProfile.id) {
+			throw new AppError(
+				403,
+				"You are not authorized to view the leaderboard for this assessment.",
+			);
+		}
+	}
+
+	const page = Number(query.page) || 1;
+	const limit = Number(query.limit) || 10;
+	const skip = (page - 1) * limit;
+
+	// query candidate attempts ordered by total score descending and submit time ascending
+	// console.log("fetching submitted attempts for leaderboard");
+	const [attempts, total] = await Promise.all([
+		prisma.candidateAttempt.findMany({
+			where: {
+				assessmentId,
+				status: "SUBMITTED",
+				deletedAt: null,
+			},
+			orderBy: [{ totalScore: "desc" }, { submittedAt: "asc" }],
+			skip,
+			take: limit,
+			include: {
+				candidate: {
+					include: {
+						user: {
+							select: {
+								id: true,
+								name: true,
+								email: true,
+							},
+						},
+					},
+				},
+			},
+		}),
+		prisma.candidateAttempt.count({
+			where: {
+				assessmentId,
+				status: "SUBMITTED",
+				deletedAt: null,
+			},
+		}),
+	]);
+
+	// map candidate leaderboard rankings and performance metrics
+	// console.log("mapping leaderboard rankings");
+	const totalMarks = assessment.totalMarks || 100;
+	const leaderboard: ILeaderboardEntry[] = attempts.map((attempt, index) => {
+		let durationMinutesTaken = 0;
+		if (attempt.startedAt && attempt.submittedAt) {
+			durationMinutesTaken = Math.max(
+				1,
+				Math.round(
+					(attempt.submittedAt.getTime() - attempt.startedAt.getTime()) /
+						(1000 * 60),
+				),
+			);
+		}
+
+		const percentage =
+			totalMarks > 0
+				? Number(((attempt.totalScore / totalMarks) * 100).toFixed(2))
+				: 0;
+
+		return {
+			rank: skip + index + 1,
+			attemptId: attempt.id,
+			candidateId: attempt.candidate.id,
+			candidateName: attempt.candidate.user.name,
+			candidateEmail: attempt.candidate.user.email,
+			totalScore: attempt.totalScore,
+			percentage,
+			isPassed: attempt.isPassed,
+			durationMinutesTaken,
+			submittedAt: attempt.submittedAt,
+			antiCheatFlags: attempt.antiCheatFlags,
+		};
+	});
+
+	return {
+		meta: {
+			page,
+			limit,
+			total,
+			totalPages: Math.ceil(total / limit),
+		},
+		data: leaderboard,
+	};
+};
+
+export const getAssessmentAnalytics = async (
+	assessmentId: string,
+	userId: string,
+	userRole: string,
+): Promise<IAssessmentAnalytics> => {
+	// verify assessment existence
+	// console.log("checking assessment existence for analytics");
+	const assessment = await prisma.assessment.findFirst({
+		where: { id: assessmentId, deletedAt: null },
+	});
+
+	if (!assessment) {
+		throw new AppError(404, "Assessment not found.");
+	}
+
+	// verify recruiter ownership if not admin
+	// console.log("verifying recruiter authorization for analytics");
+	if (userRole !== "ADMIN") {
+		const recruiterProfile = await prisma.recruiterProfile.findUnique({
+			where: { userId },
+		});
+		if (!recruiterProfile || assessment.recruiterId !== recruiterProfile.id) {
+			throw new AppError(
+				403,
+				"You are not authorized to view analytics for this assessment.",
+			);
+		}
+	}
+
+	// fetch aggregate stats invitations and attempts counts
+	// console.log("fetching aggregate stats for assessment");
+	const [totalInvitations, attempts, aggregateStats] = await Promise.all([
+		prisma.assessmentInvitation.count({
+			where: { assessmentId, deletedAt: null },
+		}),
+		prisma.candidateAttempt.findMany({
+			where: { assessmentId, deletedAt: null },
+			select: {
+				status: true,
+				isPassed: true,
+				totalScore: true,
+			},
+		}),
+		prisma.candidateAttempt.aggregate({
+			where: { assessmentId, status: "SUBMITTED", deletedAt: null },
+			_avg: { totalScore: true },
+			_max: { totalScore: true },
+			_min: { totalScore: true },
+		}),
+	]);
+
+	// calculate metrics and pass rates
+	// console.log("calculating analytics metrics");
+	const totalAttempts = attempts.length;
+	const submittedAttempts = attempts.filter((a) => a.status === "SUBMITTED");
+	const totalSubmitted = submittedAttempts.length;
+	const totalPassed = submittedAttempts.filter((a) => a.isPassed).length;
+	const totalFailed = totalSubmitted - totalPassed;
+	const passRatePercentage =
+		totalSubmitted > 0
+			? Number(((totalPassed / totalSubmitted) * 100).toFixed(2))
+			: 0;
+
+	const averageScore = Number((aggregateStats._avg.totalScore || 0).toFixed(2));
+	const highestScore = aggregateStats._max.totalScore || 0;
+	const lowestScore = aggregateStats._min.totalScore || 0;
+
+	return {
+		assessmentId: assessment.id,
+		assessmentTitle: assessment.title,
+		totalInvitations,
+		totalAttempts,
+		totalSubmittedAttempts: totalSubmitted,
+		totalPassed,
+		totalFailed,
+		passRatePercentage,
+		averageScore,
+		highestScore,
+		lowestScore,
+		totalMarks: assessment.totalMarks,
+		passMarks: assessment.passMarks,
+	};
+};
+
 export const AssessmentService = {
 	createAssessment,
 	getAllAssessments,
@@ -426,4 +627,6 @@ export const AssessmentService = {
 	addQuestionToAssessment,
 	removeQuestionFromAssessment,
 	deleteAssessment,
+	getAssessmentLeaderboard,
+	getAssessmentAnalytics,
 };

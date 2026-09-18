@@ -117,6 +117,52 @@ export const deleteAssessment = catchAsync(
 	},
 );
 
+export const getAssessmentLeaderboard = catchAsync(
+	async (req: Request, res: Response) => {
+		const { id } = req.params;
+		const userId = req.user?.userId as string;
+		const userRole = req.user?.role as string;
+		// console.log("controller fetching leaderboard for assessment id:", id);
+
+		const result = await AssessmentService.getAssessmentLeaderboard(
+			id as string,
+			userId,
+			userRole,
+			req.query,
+		);
+
+		sendResponse(res, {
+			statusCode: 200,
+			success: true,
+			message: "Assessment leaderboard retrieved successfully",
+			meta: result.meta,
+			data: result.data,
+		});
+	},
+);
+
+export const getAssessmentAnalytics = catchAsync(
+	async (req: Request, res: Response) => {
+		const { id } = req.params;
+		const userId = req.user?.userId as string;
+		const userRole = req.user?.role as string;
+		// console.log("controller fetching analytics for assessment id:", id);
+
+		const result = await AssessmentService.getAssessmentAnalytics(
+			id as string,
+			userId,
+			userRole,
+		);
+
+		sendResponse(res, {
+			statusCode: 200,
+			success: true,
+			message: "Assessment analytics retrieved successfully",
+			data: result,
+		});
+	},
+);
+
 export const AssessmentController = {
 	createAssessment,
 	getAllAssessments,
@@ -125,4 +171,6 @@ export const AssessmentController = {
 	addQuestionToAssessment,
 	removeQuestionFromAssessment,
 	deleteAssessment,
+	getAssessmentLeaderboard,
+	getAssessmentAnalytics,
 };

@@ -51,4 +51,18 @@ router.delete(
 	AssessmentController.deleteAssessment,
 );
 
+// get leaderboard ranking of candidates for assessment
+router.get(
+	"/:id/leaderboard",
+	checkAuth("ADMIN", "RECRUITER"),
+	AssessmentController.getAssessmentLeaderboard,
+);
+
+// get performance analytics and statistics for assessment
+router.get(
+	"/:id/analytics",
+	checkAuth("ADMIN", "RECRUITER"),
+	AssessmentController.getAssessmentAnalytics,
+);
+
 export const AssessmentRoutes = router;

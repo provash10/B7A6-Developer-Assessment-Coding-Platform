@@ -39,3 +39,33 @@ export interface IAddQuestionToAssessmentInput {
 	questionId: string;
 	orderIndex?: number;
 }
+
+export interface ILeaderboardEntry {
+	rank: number;
+	attemptId: string;
+	candidateId: string;
+	candidateName: string;
+	candidateEmail: string;
+	totalScore: number;
+	percentage: number;
+	isPassed: boolean;
+	durationMinutesTaken: number;
+	submittedAt: Date | null;
+	antiCheatFlags: number;
+}
+
+export interface IAssessmentAnalytics {
+	assessmentId: string;
+	assessmentTitle: string;
+	totalInvitations: number;
+	totalAttempts: number;
+	totalSubmittedAttempts: number;
+	totalPassed: number;
+	totalFailed: number;
+	passRatePercentage: number;
+	averageScore: number;
+	highestScore: number;
+	lowestScore: number;
+	totalMarks: number;
+	passMarks: number;
+}
