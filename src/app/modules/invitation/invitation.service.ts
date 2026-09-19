@@ -504,7 +504,10 @@ export const getSingleInvitation = async (
 	return invitation;
 };
 
-export const acceptInvitation = async (invitationId: string, userId: string) => {
+export const acceptInvitation = async (
+	invitationId: string,
+	userId: string,
+) => {
 	// console.log("accept invitation called with invitation id:", invitationid, "user id:", userid);
 
 	// fetch candidate profile for logged in user

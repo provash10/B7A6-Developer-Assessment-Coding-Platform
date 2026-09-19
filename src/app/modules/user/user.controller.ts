@@ -46,7 +46,15 @@ export const updateUserRole = catchAsync(
 	async (req: Request, res: Response) => {
 		const { id } = req.params;
 		const { role } = req.body;
-		const result = await UserService.updateUserRole(id as string, role);
+		const performedBy = req.user?.userId;
+		const ipAddress = req.ip;
+
+		const result = await UserService.updateUserRole(
+			id as string,
+			role,
+			performedBy,
+			ipAddress,
+		);
 
 		sendResponse(res, {
 			statusCode: 200,

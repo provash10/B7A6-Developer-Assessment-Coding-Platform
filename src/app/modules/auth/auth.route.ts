@@ -1,4 +1,5 @@
 import { Router } from "express";
+import checkAuth from "../../middleware/checkAuth";
 import validateRequest from "../../middleware/validateRequest";
 import { AuthController } from "./auth.controller";
 import { AuthValidation } from "./auth.validation";
@@ -17,6 +18,17 @@ router.post(
 	AuthController.login,
 );
 
+router.post("/refresh-token", AuthController.refreshToken);
+
+router.post("/logout", AuthController.logout);
+
+router.post(
+	"/change-password",
+	checkAuth(),
+	validateRequest(AuthValidation.changePasswordSchema),
+	AuthController.changePassword,
+);
+
 router.post(
 	"/forgot-password",
 	validateRequest(AuthValidation.forgotPasswordSchema),
@@ -27,6 +39,12 @@ router.post(
 	"/reset-password",
 	validateRequest(AuthValidation.resetPasswordSchema),
 	AuthController.resetPassword,
+);
+
+router.post(
+	"/google",
+	validateRequest(AuthValidation.googleLoginSchema),
+	AuthController.googleLogin,
 );
 
 router.post(

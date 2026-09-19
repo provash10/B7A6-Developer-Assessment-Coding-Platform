@@ -43,3 +43,13 @@ export interface ILoginResponse {
 	accessToken: string;
 	refreshToken: string;
 }
+
+export interface IChangePasswordInput {
+	oldPassword: string;
+	newPassword: string;
+}
+
+export interface IRefreshTokenResponse {
+	accessToken: string;
+	refreshToken: string;
+}

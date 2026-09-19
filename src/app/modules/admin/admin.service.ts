@@ -2,6 +2,7 @@ import { type Prisma, UserRole } from "@prisma/client";
 import { prisma } from "../../lib/prisma";
 import type {
 	IAuditLogFilterParams,
+	ICreateAuditLogPayload,
 	IDashboardStatsResponse,
 } from "./admin.interface";
 
@@ -172,16 +173,8 @@ export const getAuditLogs = async (params: IAuditLogFilterParams) => {
 	};
 };
 
-export const createAuditLog = async (payload: {
-	userId: string;
-	action: string;
-	entityType: string;
-	entityId: string;
-	oldValue?: any;
-	newValue?: any;
-	ipAddress?: string;
-}) => {
-	// console.log("recording audit log entry");
+export const createAuditLog = async (payload: ICreateAuditLogPayload) => {
+	// console.log("recording audit log entry in database");
 	return prisma.auditLog.create({
 		data: {
 			userId: payload.userId,

@@ -194,9 +194,7 @@ export const getAttemptQuestions = async (
 	const questions: ISanitizedQuestion[] =
 		attempt.assessment.assessmentQuestions.map((aq) => {
 			const q = aq.question;
-			const currentSub = attempt.submissions.find(
-				(s) => s.questionId === q.id,
-			);
+			const currentSub = attempt.submissions.find((s) => s.questionId === q.id);
 
 			// sanitize options for MCQ
 			let sanitizedOptions: unknown = q.options;
@@ -556,10 +554,7 @@ export const finishAttempt = async (
 	}
 
 	if (attempt.candidateId !== candidateProfile.id) {
-		throw new AppError(
-			403,
-			"You are not authorized to finish this attempt.",
-		);
+		throw new AppError(403, "You are not authorized to finish this attempt.");
 	}
 
 	// if already submitted, calculate and return existing result
@@ -606,9 +601,7 @@ export const finishAttempt = async (
 	const isPassed = totalScore >= passMarks;
 	const totalMarks = attempt.assessment.totalMarks || 100;
 	const percentage =
-		totalMarks > 0
-			? Number(((totalScore / totalMarks) * 100).toFixed(2))
-			: 0;
+		totalMarks > 0 ? Number(((totalScore / totalMarks) * 100).toFixed(2)) : 0;
 	const submittedAt = new Date();
 
 	// finalize candidate attempt
@@ -782,8 +775,7 @@ export const getAttemptResult = async (
 			isPassed: attempt.isPassed,
 			antiCheatFlags: attempt.antiCheatFlags,
 			totalAnsweredQuestions: attempt.submissions.length,
-			totalAssessmentQuestions:
-				attempt.assessment.assessmentQuestions.length,
+			totalAssessmentQuestions: attempt.assessment.assessmentQuestions.length,
 		},
 		submissions: questionSubmissions,
 	};

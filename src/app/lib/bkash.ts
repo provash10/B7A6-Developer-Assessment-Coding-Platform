@@ -78,7 +78,9 @@ export const getBkashIdToken = async (): Promise<string> => {
 /**
  * Returns pre-configured headers required for bKash authenticated API calls (create, execute, query).
  */
-export const getBkashAuthHeaders = async (): Promise<Record<string, string>> => {
+export const getBkashAuthHeaders = async (): Promise<
+	Record<string, string>
+> => {
 	const idToken = await getBkashIdToken();
 
 	return {

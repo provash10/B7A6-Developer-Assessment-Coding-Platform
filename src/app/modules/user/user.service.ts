@@ -1,6 +1,7 @@
 import type { UserRole } from "@prisma/client";
 import { prisma } from "../../lib/prisma";
 import AppError from "../../utils/AppError";
+import { createAuditLog } from "../admin/admin.service";
 import type { IUpdateProfileInput, IUserFilterParams } from "./user.interface";
 
 export const getMyProfile = async (userId: string) => {
@@ -116,7 +117,12 @@ export const getAllUsers = async (query: IUserFilterParams) => {
 	};
 };
 
-export const updateUserRole = async (userId: string, role: UserRole) => {
+export const updateUserRole = async (
+	userId: string,
+	role: UserRole,
+	performedBy?: string,
+	ipAddress?: string,
+) => {
 	const user = await prisma.user.findUnique({ where: { id: userId } });
 	if (!user) {
 		throw new AppError(404, "User not found.");
@@ -133,6 +139,19 @@ export const updateUserRole = async (userId: string, role: UserRole) => {
 			updatedAt: true,
 		},
 	});
+
+	// record audit log entry for role change
+	if (performedBy) {
+		await createAuditLog({
+			userId: performedBy,
+			action: "USER_ROLE_UPDATED",
+			entityType: "USER",
+			entityId: userId,
+			oldValue: { role: user.role },
+			newValue: { role },
+			ipAddress: ipAddress ?? undefined,
+		});
+	}
 
 	return updatedUser;
 };

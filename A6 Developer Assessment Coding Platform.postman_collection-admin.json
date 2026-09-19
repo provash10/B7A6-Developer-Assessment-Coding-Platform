@@ -1,0 +1,218 @@
+{
+	"info": {
+		"_postman_id": "e9b41a23-45c1-48d6-9432-8df67145ab01",
+		"name": "A6 Developer Assessment Coding Platform - Admin",
+		"description": "Postman Collection for Admin Dashboard Stats, Audit Logs, and User Management operations.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Admin",
+			"item": [
+				{
+					"name": "1. Admin Dashboard Stats",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/v1/admin/dashboard-stats",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"v1",
+								"admin",
+								"dashboard-stats"
+							]
+						},
+						"description": "Fetches overall system analytics including users count by role, active assessments count, question count, exam attempt pass rates, and total revenue in BDT from successful payments."
+					},
+					"response": []
+				},
+				{
+					"name": "2. Get Audit Logs (Paginated)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/v1/admin/audit-logs?page=1&limit=10",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"v1",
+								"admin",
+								"audit-logs"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Retrieves system audit logs sorted by newest first with pagination and user performer details."
+					},
+					"response": []
+				},
+				{
+					"name": "3. Get Audit Logs (Filter by Entity & Action)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/v1/admin/audit-logs?entityType=USER&action=USER_ROLE_UPDATED&page=1&limit=10",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"v1",
+								"admin",
+								"audit-logs"
+							],
+							"query": [
+								{
+									"key": "entityType",
+									"value": "USER"
+								},
+								{
+									"key": "action",
+									"value": "USER_ROLE_UPDATED"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Filters audit logs by entityType (e.g. USER, ASSESSMENT) and action."
+					},
+					"response": []
+				},
+				{
+					"name": "4. Get Audit Logs (Search Term)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/v1/admin/audit-logs?searchTerm=ASSESSMENT&page=1&limit=10",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"v1",
+								"admin",
+								"audit-logs"
+							],
+							"query": [
+								{
+									"key": "searchTerm",
+									"value": "ASSESSMENT"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Searches audit logs by keyword matching action, entityType, or entityId."
+					},
+					"response": []
+				},
+				{
+					"name": "5. Update User Role (Triggers Audit Log)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"role\": \"RECRUITER\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/v1/users/:id/role",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"v1",
+								"users",
+								":id",
+								"role"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "USER_ID_HERE"
+								}
+							]
+						},
+						"description": "Admin updates a user's role (ADMIN, RECRUITER, CANDIDATE). This action automatically inserts a new entry into AuditLog."
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

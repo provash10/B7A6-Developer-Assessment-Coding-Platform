@@ -105,8 +105,14 @@ export const removeQuestionFromAssessment = catchAsync(
 export const deleteAssessment = catchAsync(
 	async (req: Request, res: Response) => {
 		const { id } = req.params;
-		// console.log("Controller deleting assessment ID:", id);
-		const result = await AssessmentService.deleteAssessment(id as string);
+		const deletedBy = req.user?.userId;
+		const ipAddress = req.ip;
+		// console.log("controller deleting assessment id:", id);
+		const result = await AssessmentService.deleteAssessment(
+			id as string,
+			deletedBy,
+			ipAddress,
+		);
 
 		sendResponse(res, {
 			statusCode: 200,

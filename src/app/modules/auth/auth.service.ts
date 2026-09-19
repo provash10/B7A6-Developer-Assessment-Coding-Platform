@@ -5,10 +5,13 @@ import { googleClient } from "../../lib/googleAuth";
 import { sendEmail } from "../../lib/nodemailer";
 import { prisma } from "../../lib/prisma";
 import AppError from "../../utils/AppError";
+import jwtUtils from "../../utils/jwt";
 import type {
+	IChangePasswordInput,
 	IForgotPasswordInput,
 	IGoogleLoginInput,
 	ILoginUserInput,
+	IRefreshTokenResponse,
 	IRegisterUserInput,
 	IResetPasswordInput,
 } from "./auth.interface";
@@ -113,49 +116,45 @@ export const registerUser = async (payload: IRegisterUserInput) => {
 };
 
 export const loginUser = async (payload: ILoginUserInput) => {
+	const { password } = payload;
+	const email = payload.email.trim().toLowerCase();
+
 	const user = await prisma.user.findUnique({
-		where: { email: payload.email },
+		where: { email },
 	});
 
-	if (!user || user.deletedAt) {
-		throw new AppError(401, "Invalid email or password.");
+	if (!user) {
+		throw new AppError(404, "User Not Found");
 	}
 
-	const isPasswordMatch = await bcrypt.compare(
-		payload.password,
-		user.passwordHash,
-	);
-
-	if (!isPasswordMatch) {
-		throw new AppError(401, "Invalid email or password.");
+	if (user.deletedAt) {
+		throw new AppError(403, "User is deleted");
 	}
 
-	const accessToken = jwt.sign(
-		{
-			id: user.id,
-			userId: user.id,
-			name: user.name,
-			email: user.email,
-			role: user.role,
-		},
-		config.jwt.jwt_secret as string,
-		{
-			expiresIn: config.jwt.expires_in as any,
-		},
+	const isPasswordMatched = await bcrypt.compare(password, user.passwordHash);
+
+	if (!isPasswordMatched) {
+		throw new AppError(401, "Invalid credentials");
+	}
+
+	const jwtPayload = {
+		id: user.id,
+		userId: user.id,
+		name: user.name,
+		email: user.email,
+		role: user.role,
+	};
+
+	const accessToken = jwtUtils.createToken(
+		jwtPayload,
+		config.jwt.jwt_secret,
+		config.jwt.expires_in,
 	);
 
-	const refreshToken = jwt.sign(
-		{
-			id: user.id,
-			userId: user.id,
-			name: user.name,
-			email: user.email,
-			role: user.role,
-		},
-		config.jwt.refresh_token_secret as string,
-		{
-			expiresIn: config.jwt.refresh_token_expires_in as any,
-		},
+	const refreshToken = jwtUtils.createToken(
+		jwtPayload,
+		config.jwt.refresh_token_secret,
+		config.jwt.refresh_token_expires_in,
 	);
 
 	return {
@@ -224,26 +223,47 @@ export const resetPassword = async (payload: IResetPasswordInput) => {
 };
 
 export const googleLogin = async (payload: IGoogleLoginInput) => {
-	const ticket = await googleClient.verifyIdToken({
-		idToken: payload.idToken,
-		audience: config.google_client_id,
-	});
+	let googlePayload: any = null;
 
-	const googlePayload = ticket.getPayload();
-	if (!googlePayload || !googlePayload.email) {
-		throw new AppError(400, "Google authentication failed.");
+	try {
+		const ticket = await googleClient.verifyIdToken({
+			idToken: payload.idToken,
+			audience: config.google_client_id,
+		});
+		googlePayload = ticket.getPayload();
+	} catch (error) {
+		console.log("Google ID Token Verification Failed", error);
+		throw new AppError(401, "Invalid Or Expired Google Id Token");
 	}
 
+	if (!googlePayload) {
+		throw new AppError(401, "Invalid Or Expired Google Id Token");
+	}
+
+	if (!googlePayload.email) {
+		throw new AppError(400, "Google Email Not Found");
+	}
+
+	if (!googlePayload.name) {
+		throw new AppError(400, "Google User Name Not Found");
+	}
+
+	const email = googlePayload.email.trim().toLowerCase();
+
 	let user = await prisma.user.findUnique({
-		where: { email: googlePayload.email },
+		where: { email },
 	});
 
-	if (!user) {
+	if (user) {
+		if (user.deletedAt) {
+			throw new AppError(403, "User is deleted");
+		}
+	} else {
 		const randomPassword = await bcrypt.hash(Math.random().toString(36), 10);
 		user = await prisma.user.create({
 			data: {
-				email: googlePayload.email,
-				name: googlePayload.name || "Google User",
+				email,
+				name: googlePayload.name,
 				passwordHash: randomPassword,
 				role: "CANDIDATE",
 				candidateProfile: {
@@ -253,34 +273,39 @@ export const googleLogin = async (payload: IGoogleLoginInput) => {
 				},
 			},
 		});
+
+		// Send welcome email (non-blocking)
+		sendEmail({
+			to: user.email,
+			subject: "Welcome to Developer Assessment Platform",
+			templateName: "registration-user-otp",
+			templateData: {
+				name: user.name,
+				email: user.email,
+				otp: "GOOGLE_AUTH",
+				expirationMinutes: 10,
+			},
+		}).catch((_err) => {});
 	}
 
-	const accessToken = jwt.sign(
-		{
-			id: user.id,
-			userId: user.id,
-			name: user.name,
-			email: user.email,
-			role: user.role,
-		},
-		config.jwt.jwt_secret as string,
-		{
-			expiresIn: config.jwt.expires_in as any,
-		},
+	const jwtPayload = {
+		id: user.id,
+		userId: user.id,
+		name: user.name,
+		email: user.email,
+		role: user.role,
+	};
+
+	const accessToken = jwtUtils.createToken(
+		jwtPayload,
+		config.jwt.jwt_secret,
+		config.jwt.expires_in,
 	);
 
-	const refreshToken = jwt.sign(
-		{
-			id: user.id,
-			userId: user.id,
-			name: user.name,
-			email: user.email,
-			role: user.role,
-		},
-		config.jwt.refresh_token_secret as string,
-		{
-			expiresIn: config.jwt.refresh_token_expires_in as any,
-		},
+	const refreshToken = jwtUtils.createToken(
+		jwtPayload,
+		config.jwt.refresh_token_secret,
+		config.jwt.refresh_token_expires_in,
 	);
 
 	return {
@@ -295,10 +320,90 @@ export const googleLogin = async (payload: IGoogleLoginInput) => {
 	};
 };
 
+export const refreshToken = async (
+	token: string,
+): Promise<IRefreshTokenResponse> => {
+	let decodedPayload: jwt.JwtPayload;
+	try {
+		decodedPayload = jwt.verify(
+			token,
+			config.jwt.refresh_token_secret as string,
+		) as jwt.JwtPayload;
+	} catch (_err: any) {
+		throw new AppError(401, "Invalid or expired refresh token.");
+	}
+
+	const user = await prisma.user.findUnique({
+		where: { id: decodedPayload.userId || decodedPayload.id },
+	});
+
+	if (!user || user.deletedAt) {
+		throw new AppError(401, "User no longer exists or account is inactive.");
+	}
+
+	const jwtPayload = {
+		id: user.id,
+		userId: user.id,
+		name: user.name,
+		email: user.email,
+		role: user.role,
+	};
+
+	const accessToken = jwt.sign(jwtPayload, config.jwt.jwt_secret as string, {
+		expiresIn: config.jwt.expires_in as any,
+	});
+
+	const newRefreshToken = jwt.sign(
+		jwtPayload,
+		config.jwt.refresh_token_secret as string,
+		{
+			expiresIn: config.jwt.refresh_token_expires_in as any,
+		},
+	);
+
+	return {
+		accessToken,
+		refreshToken: newRefreshToken,
+	};
+};
+
+export const changePassword = async (
+	userId: string,
+	payload: IChangePasswordInput,
+) => {
+	const user = await prisma.user.findUnique({
+		where: { id: userId },
+	});
+
+	if (!user || user.deletedAt) {
+		throw new AppError(404, "User not found.");
+	}
+
+	const isPasswordMatch = await bcrypt.compare(
+		payload.oldPassword,
+		user.passwordHash,
+	);
+
+	if (!isPasswordMatch) {
+		throw new AppError(400, "Old password does not match.");
+	}
+
+	const newPasswordHash = await bcrypt.hash(payload.newPassword, 10);
+
+	await prisma.user.update({
+		where: { id: userId },
+		data: { passwordHash: newPasswordHash },
+	});
+
+	return { message: "Password changed successfully." };
+};
+
 export const AuthService = {
 	registerUser,
 	loginUser,
 	forgotPassword,
 	resetPassword,
 	googleLogin,
+	refreshToken,
+	changePassword,
 };

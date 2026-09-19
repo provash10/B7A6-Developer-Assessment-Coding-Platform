@@ -33,3 +33,13 @@ export interface IAuditLogFilterParams {
 	startDate?: string;
 	endDate?: string;
 }
+
+export interface ICreateAuditLogPayload {
+	userId: string;
+	action: string;
+	entityType: string;
+	entityId: string;
+	oldValue?: any;
+	newValue?: any;
+	ipAddress?: string;
+}

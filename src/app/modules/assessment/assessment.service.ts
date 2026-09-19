@@ -1,6 +1,7 @@
 import type { Prisma } from "@prisma/client";
 import { prisma } from "../../lib/prisma";
 import AppError from "../../utils/AppError";
+import { createAuditLog } from "../admin/admin.service";
 import type {
 	IAddQuestionToAssessmentInput,
 	IAssessmentAnalytics,
@@ -404,7 +405,11 @@ export const removeQuestionFromAssessment = async (
 	return getAssessmentById(assessmentId);
 };
 
-export const deleteAssessment = async (id: string) => {
+export const deleteAssessment = async (
+	id: string,
+	deletedBy?: string,
+	ipAddress?: string,
+) => {
 	const existingAssessment = await prisma.assessment.findFirst({
 		where: { id },
 	});
@@ -416,6 +421,21 @@ export const deleteAssessment = async (id: string) => {
 	const deletedAssessment = await prisma.assessment.delete({
 		where: { id },
 	});
+
+	// record audit log entry for assessment deletion
+	if (deletedBy) {
+		await createAuditLog({
+			userId: deletedBy,
+			action: "ASSESSMENT_DELETED",
+			entityType: "ASSESSMENT",
+			entityId: id,
+			oldValue: {
+				title: existingAssessment.title,
+				recruiterId: existingAssessment.recruiterId,
+			},
+			ipAddress: ipAddress ?? undefined,
+		});
+	}
 
 	return deletedAssessment;
 };
