@@ -29,4 +29,16 @@ export default {
 	bkash_app_key: process.env.BKASH_APP_KEY!,
 	bkash_app_secret: process.env.BKASH_APP_SECRET!,
 	bkash_callback_url: process.env.BKASH_CALLBACK_URL!,
+
+	admin_name: process.env.ADMIN_NAME || "System Admin",
+	admin_email: process.env.ADMIN_EMAIL || "admin@100.com",
+	admin_password: process.env.ADMIN_PASSWORD || "Password@100",
+
+	recruiter_name: process.env.RECRUITER_NAME || "Jane Recruiter",
+	recruiter_email: process.env.RECRUITER_EMAIL || "recruiter@100.com",
+	recruiter_password: process.env.RECRUITER_PASSWORD || "Password@100",
+
+	candidate_name: process.env.CANDIDATE_NAME || "John Developer",
+	candidate_email: process.env.CANDIDATE_EMAIL || "candidate@100.com",
+	candidate_password: process.env.CANDIDATE_PASSWORD || "Password@100",
 };

@@ -1,22 +1,23 @@
 import bcrypt from "bcryptjs";
+import config from "../config";
 import { prisma } from "../lib/prisma";
 
 async function seed() {
 	try {
 		console.log("🌱 Seeding initial database records...");
 
-		const adminPassword = await bcrypt.hash("Password@100", 10);
-		const recruiterPassword = await bcrypt.hash("Password@100", 10);
-		const candidatePassword = await bcrypt.hash("Password@100", 10);
+		const adminPassword = await bcrypt.hash(config.admin_password, 10);
+		const recruiterPassword = await bcrypt.hash(config.recruiter_password, 10);
+		const candidatePassword = await bcrypt.hash(config.candidate_password, 10);
 
 		// 1. Seed Admin User
 		const adminUser = await prisma.user.upsert({
-			where: { email: "admin@100.com" },
+			where: { email: config.admin_email },
 			update: { passwordHash: adminPassword },
 			create: {
-				email: "admin@100.com",
+				email: config.admin_email,
 				passwordHash: adminPassword,
-				name: "System Admin",
+				name: config.admin_name,
 				phone: "+8801700000000",
 				role: "ADMIN",
 			},
@@ -25,12 +26,12 @@ async function seed() {
 
 		// 2. Seed Recruiter User & Profile
 		const recruiterUser = await prisma.user.upsert({
-			where: { email: "recruiter@100.com" },
+			where: { email: config.recruiter_email },
 			update: { passwordHash: recruiterPassword },
 			create: {
-				email: "recruiter@100.com",
+				email: config.recruiter_email,
 				passwordHash: recruiterPassword,
-				name: "Jane Recruiter",
+				name: config.recruiter_name,
 				phone: "+8801711111111",
 				role: "RECRUITER",
 				recruiterProfile: {
@@ -49,12 +50,12 @@ async function seed() {
 
 		// 3. Seed Candidate User & Profile
 		const candidateUser = await prisma.user.upsert({
-			where: { email: "candidate@100.com" },
+			where: { email: config.candidate_email },
 			update: { passwordHash: candidatePassword },
 			create: {
-				email: "candidate@100.com",
+				email: config.candidate_email,
 				passwordHash: candidatePassword,
-				name: "John Developer",
+				name: config.candidate_name,
 				phone: "+8801722222222",
 				role: "CANDIDATE",
 				candidateProfile: {
