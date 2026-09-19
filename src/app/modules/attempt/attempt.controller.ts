@@ -109,6 +109,18 @@ export const getAttemptResult = catchAsync(
 	},
 );
 
+export const getMyAttempts = catchAsync(async (req: Request, res: Response) => {
+	const userId = req.user?.userId as string;
+	const result = await AttemptService.getMyAttempts(userId, req.query);
+
+	sendResponse(res, {
+		statusCode: 200,
+		success: true,
+		message: "My assessment attempts retrieved successfully",
+		data: result,
+	});
+});
+
 export const AttemptController = {
 	startAttempt,
 	getAttemptQuestions,
@@ -116,4 +128,5 @@ export const AttemptController = {
 	recordAntiCheatFlag,
 	finishAttempt,
 	getAttemptResult,
+	getMyAttempts,
 };

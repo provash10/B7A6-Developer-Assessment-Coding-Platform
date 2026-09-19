@@ -141,15 +141,19 @@ export const deleteQuestion = async (id: string) => {
 	const existingQuestion = await prisma.question.findFirst({
 		where: {
 			id,
+			deletedAt: null,
 		},
 	});
 
 	if (!existingQuestion) {
-		throw new AppError(404, "Question not found.");
+		throw new AppError(404, "Question not found or already deleted.");
 	}
 
-	const deletedQuestion = await prisma.question.delete({
+	const deletedQuestion = await prisma.question.update({
 		where: { id },
+		data: {
+			deletedAt: new Date(),
+		},
 	});
 
 	return deletedQuestion;

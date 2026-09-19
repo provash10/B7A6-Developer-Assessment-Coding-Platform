@@ -6,6 +6,14 @@ import { AttemptValidation } from "./attempt.validation";
 
 const router = Router();
 
+// Candidate gets all their personal assessment attempts
+router.get("/my", checkAuth("CANDIDATE"), AttemptController.getMyAttempts);
+router.get(
+	"/my-attempts",
+	checkAuth("CANDIDATE"),
+	AttemptController.getMyAttempts,
+);
+
 // Candidate starts assessment attempt and activates timer
 router.post(
 	"/:id/start",

@@ -411,15 +411,18 @@ export const deleteAssessment = async (
 	ipAddress?: string,
 ) => {
 	const existingAssessment = await prisma.assessment.findFirst({
-		where: { id },
+		where: { id, deletedAt: null },
 	});
 
 	if (!existingAssessment) {
-		throw new AppError(404, "Assessment not found.");
+		throw new AppError(404, "Assessment not found or already deleted.");
 	}
 
-	const deletedAssessment = await prisma.assessment.delete({
+	const deletedAssessment = await prisma.assessment.update({
 		where: { id },
+		data: {
+			deletedAt: new Date(),
+		},
 	});
 
 	// record audit log entry for assessment deletion

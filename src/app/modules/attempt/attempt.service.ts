@@ -1,4 +1,4 @@
-import type { UserRole } from "@prisma/client";
+import type { Prisma, UserRole } from "@prisma/client";
 import { prisma } from "../../lib/prisma";
 import AppError from "../../utils/AppError";
 import type {
@@ -781,6 +781,63 @@ export const getAttemptResult = async (
 	};
 };
 
+export const getMyAttempts = async (
+	userId: string,
+	query: { page?: number; limit?: number; status?: string },
+) => {
+	const candidateProfile = await prisma.candidateProfile.findUnique({
+		where: { userId },
+	});
+
+	if (!candidateProfile) {
+		throw new AppError(404, "Candidate profile not found.");
+	}
+
+	const page = Number(query.page) || 1;
+	const limit = Number(query.limit) || 10;
+	const skip = (page - 1) * limit;
+
+	const whereConditions: Prisma.CandidateAttemptWhereInput = {
+		candidateId: candidateProfile.id,
+		deletedAt: null,
+	};
+
+	if (query.status) {
+		whereConditions.status = query.status as any;
+	}
+
+	const total = await prisma.candidateAttempt.count({ where: whereConditions });
+	const attempts = await prisma.candidateAttempt.findMany({
+		where: whereConditions,
+		skip,
+		take: limit,
+		orderBy: { createdAt: "desc" },
+		include: {
+			assessment: {
+				select: {
+					id: true,
+					title: true,
+					description: true,
+					durationMinutes: true,
+					passMarks: true,
+					totalMarks: true,
+					status: true,
+				},
+			},
+		},
+	});
+
+	return {
+		meta: {
+			page,
+			limit,
+			total,
+			totalPages: Math.ceil(total / limit),
+		},
+		data: attempts,
+	};
+};
+
 export const AttemptService = {
 	startAttempt,
 	getAttemptQuestions,
@@ -788,4 +845,5 @@ export const AttemptService = {
 	recordAntiCheatFlag,
 	finishAttempt,
 	getAttemptResult,
+	getMyAttempts,
 };
