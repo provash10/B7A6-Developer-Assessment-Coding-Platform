@@ -36,9 +36,14 @@ const resetPasswordSchema = z.object({
 });
 
 const googleLoginSchema = z.object({
-	body: z.object({
-		idToken: z.string().min(1, "Google ID Token is required"),
-	}),
+	body: z
+		.object({
+			idToken: z.string().optional(),
+			id_token: z.string().optional(),
+		})
+		.refine((data) => data.idToken || data.id_token, {
+			message: "Google ID Token (idToken or id_token) is required",
+		}),
 });
 
 const changePasswordSchema = z.object({

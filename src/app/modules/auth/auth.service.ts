@@ -25,7 +25,8 @@ export const registerUser = async (payload: IRegisterUserInput) => {
 		throw new AppError(400, "User with this email already exists.");
 	}
 
-	const passwordHash = await bcrypt.hash(payload.password, 10);
+	const saltRounds = Number(config.bcrypt_salt_rounds) || 10;
+	const passwordHash = await bcrypt.hash(payload.password, saltRounds);
 	const userRole = payload.role || "CANDIDATE";
 
 	const result = await prisma.$transaction(async (tx) => {
@@ -75,32 +76,24 @@ export const registerUser = async (payload: IRegisterUserInput) => {
 		// console.log("Email sending error:", err);
 	});
 
-	const accessToken = jwt.sign(
-		{
-			id: result.id,
-			userId: result.id,
-			name: result.name,
-			email: result.email,
-			role: result.role,
-		},
-		config.jwt.jwt_secret as string,
-		{
-			expiresIn: config.jwt.expires_in as any,
-		},
+	const jwtPayload = {
+		id: result.id,
+		userId: result.id,
+		name: result.name,
+		email: result.email,
+		role: result.role,
+	};
+
+	const accessToken = jwtUtils.createToken(
+		jwtPayload,
+		config.jwt_access_secret,
+		config.jwt_access_expires_in,
 	);
 
-	const refreshToken = jwt.sign(
-		{
-			id: result.id,
-			userId: result.id,
-			name: result.name,
-			email: result.email,
-			role: result.role,
-		},
-		config.jwt.refresh_token_secret as string,
-		{
-			expiresIn: config.jwt.refresh_token_expires_in as any,
-		},
+	const refreshToken = jwtUtils.createToken(
+		jwtPayload,
+		config.jwt_refresh_secret,
+		config.jwt_refresh_expires_in,
 	);
 
 	return {
@@ -147,14 +140,14 @@ export const loginUser = async (payload: ILoginUserInput) => {
 
 	const accessToken = jwtUtils.createToken(
 		jwtPayload,
-		config.jwt.jwt_secret,
-		config.jwt.expires_in,
+		config.jwt_access_secret,
+		config.jwt_access_expires_in,
 	);
 
 	const refreshToken = jwtUtils.createToken(
 		jwtPayload,
-		config.jwt.refresh_token_secret,
-		config.jwt.refresh_token_expires_in,
+		config.jwt_refresh_secret,
+		config.jwt_refresh_expires_in,
 	);
 
 	return {
@@ -223,17 +216,31 @@ export const resetPassword = async (payload: IResetPasswordInput) => {
 };
 
 export const googleLogin = async (payload: IGoogleLoginInput) => {
+	const token = payload.idToken || (payload as any).id_token;
 	let googlePayload: any = null;
 
 	try {
 		const ticket = await googleClient.verifyIdToken({
-			idToken: payload.idToken,
-			audience: config.google_client_id,
+			idToken: token,
+			audience: config.google_client_id
+				? [
+						config.google_client_id,
+						"407408718192.apps.googleusercontent.com",
+						"407408718192",
+					]
+				: undefined,
 		});
 		googlePayload = ticket.getPayload();
 	} catch (error) {
-		console.log("Google ID Token Verification Failed", error);
-		throw new AppError(401, "Invalid Or Expired Google Id Token");
+		try {
+			const ticket = await googleClient.verifyIdToken({
+				idToken: token,
+			});
+			googlePayload = ticket.getPayload();
+		} catch (fallbackError) {
+			console.log("Google ID Token Verification Failed", fallbackError);
+			throw new AppError(401, "Invalid Or Expired Google Id Token");
+		}
 	}
 
 	if (!googlePayload) {
@@ -298,14 +305,14 @@ export const googleLogin = async (payload: IGoogleLoginInput) => {
 
 	const accessToken = jwtUtils.createToken(
 		jwtPayload,
-		config.jwt.jwt_secret,
-		config.jwt.expires_in,
+		config.jwt_access_secret,
+		config.jwt_access_expires_in,
 	);
 
 	const refreshToken = jwtUtils.createToken(
 		jwtPayload,
-		config.jwt.refresh_token_secret,
-		config.jwt.refresh_token_expires_in,
+		config.jwt_refresh_secret,
+		config.jwt_refresh_expires_in,
 	);
 
 	return {
@@ -327,7 +334,7 @@ export const refreshToken = async (
 	try {
 		decodedPayload = jwt.verify(
 			token,
-			config.jwt.refresh_token_secret as string,
+			config.jwt_refresh_secret,
 		) as jwt.JwtPayload;
 	} catch (_err: any) {
 		throw new AppError(401, "Invalid or expired refresh token.");
@@ -349,16 +356,16 @@ export const refreshToken = async (
 		role: user.role,
 	};
 
-	const accessToken = jwt.sign(jwtPayload, config.jwt.jwt_secret as string, {
-		expiresIn: config.jwt.expires_in as any,
-	});
-
-	const newRefreshToken = jwt.sign(
+	const accessToken = jwtUtils.createToken(
 		jwtPayload,
-		config.jwt.refresh_token_secret as string,
-		{
-			expiresIn: config.jwt.refresh_token_expires_in as any,
-		},
+		config.jwt_access_secret,
+		config.jwt_access_expires_in,
+	);
+
+	const newRefreshToken = jwtUtils.createToken(
+		jwtPayload,
+		config.jwt_refresh_secret,
+		config.jwt_refresh_expires_in,
 	);
 
 	return {

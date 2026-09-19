@@ -44,7 +44,7 @@ export const checkAuth = (...requiredRoles: UserRole[]) => {
 			try {
 				decodedPayload = jwtUtils.verifyToken(
 					token,
-					config.jwt.jwt_secret,
+					config.jwt_access_secret,
 				) as JwtPayload;
 			} catch (err: any) {
 				throw new AppError(401, "Invalid or expired authorization token.");

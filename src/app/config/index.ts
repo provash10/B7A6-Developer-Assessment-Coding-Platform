@@ -4,32 +4,29 @@ import path from "path";
 dotenv.config({ path: path.join(process.cwd(), ".env") });
 
 export default {
-	env: process.env.NODE_ENV || "development",
-	port: process.env.PORT || 5000,
-	jwt: {
-		jwt_secret: process.env.JWT_SECRET || "verysecretkey",
-		expires_in: process.env.JWT_EXPIRES_IN || "7d",
-		refresh_token_secret:
-			process.env.REFRESH_TOKEN_SECRET || "verysecretrefreshkey",
-		refresh_token_expires_in: process.env.REFRESH_TOKEN_EXPIRES_IN || "30d",
-	},
-	email: {
-		user: process.env.SMTP_USER || "",
-		pass: process.env.SMTP_PASSWORD || "",
-		from: process.env.EMAIL_FROM || "no-reply@assessmentplatform.com",
-	},
-	google_client_id: process.env.GOOGLE_CLIENT_ID || "",
-	frontend_url: process.env.FRONTEND_URL || "http://localhost:3000",
-	bkash: {
-		base_url:
-			process.env.BKASH_BASE_URL ||
-			"https://tokenized.sandbox.bka.sh/v1.2.0-beta",
-		username: process.env.BKASH_USERNAME || "",
-		password: process.env.BKASH_PASSWORD || "",
-		app_key: process.env.BKASH_APP_KEY || "",
-		app_secret: process.env.BKASH_APP_SECRET || "",
-		callback_url:
-			process.env.BKASH_CALLBACK_URL ||
-			"http://localhost:5000/api/v1/payments/callback",
-	},
+	node_env: process.env.NODE_ENV,
+	port: process.env.PORT,
+	database_url: process.env.DATABASE_URL,
+
+	backend_url: process.env.BACKEND_URL,
+	frontend_url: process.env.FRONTEND_URL,
+
+	bcrypt_salt_rounds: process.env.BCRYPT_SALT_ROUNDS,
+	jwt_access_secret: process.env.JWT_ACCESS_SECRET!,
+	jwt_refresh_secret: process.env.JWT_REFRESH_SECRET!,
+	jwt_access_expires_in: process.env.JWT_ACCESS_EXPIRES_IN!,
+	jwt_refresh_expires_in: process.env.JWT_REFRESH_EXPIRES_IN!,
+
+	google_client_id: process.env.GOOGLE_CLIENT_ID!,
+
+	smtp_user: process.env.SMTP_USER!,
+	smtp_password: process.env.SMTP_PASSWORD!,
+	email_sender: process.env.EMAIL_SENDER!,
+
+	bkash_base_url: process.env.BKASH_BASE_URL!,
+	bkash_username: process.env.BKASH_USERNAME!,
+	bkash_password: process.env.BKASH_PASSWORD!,
+	bkash_app_key: process.env.BKASH_APP_KEY!,
+	bkash_app_secret: process.env.BKASH_APP_SECRET!,
+	bkash_callback_url: process.env.BKASH_CALLBACK_URL!,
 };

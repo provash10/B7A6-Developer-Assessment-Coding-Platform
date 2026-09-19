@@ -7,8 +7,8 @@ import config from "../config";
 export const transporter = nodemailer.createTransport({
 	service: "gmail",
 	auth: {
-		user: config.email.user,
-		pass: config.email.pass,
+		user: config.smtp_user,
+		pass: config.smtp_password,
 	},
 });
 
@@ -45,7 +45,7 @@ export const sendEmail = async ({
 	}
 
 	const mailOptions = {
-		from: config.email.from,
+		from: config.email_sender,
 		to,
 		subject,
 		html: mailHtml || "",

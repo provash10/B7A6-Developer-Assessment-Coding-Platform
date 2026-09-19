@@ -27,18 +27,18 @@ export const getBkashIdToken = async (): Promise<string> => {
 
 	try {
 		const response = await fetch(
-			`${config.bkash.base_url}/tokenized/checkout/token/grant`,
+			`${config.bkash_base_url}/tokenized/checkout/token/grant`,
 			{
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
 					Accept: "application/json",
-					username: config.bkash.username,
-					password: config.bkash.password,
+					username: config.bkash_username,
+					password: config.bkash_password,
 				},
 				body: JSON.stringify({
-					app_key: config.bkash.app_key,
-					app_secret: config.bkash.app_secret,
+					app_key: config.bkash_app_key,
+					app_secret: config.bkash_app_secret,
 				}),
 			},
 		);
@@ -87,6 +87,6 @@ export const getBkashAuthHeaders = async (): Promise<
 		"Content-Type": "application/json",
 		Accept: "application/json",
 		Authorization: idToken,
-		"X-App-Key": config.bkash.app_key,
+		"X-App-Key": config.bkash_app_key,
 	};
 };

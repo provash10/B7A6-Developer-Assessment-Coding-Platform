@@ -59,14 +59,14 @@ export const initiatePayment = async (
 
 	// request bKash checkout/create endpoint
 	const createResponse = await fetch(
-		`${config.bkash.base_url}/tokenized/checkout/create`,
+		`${config.bkash_base_url}/tokenized/checkout/create`,
 		{
 			method: "POST",
 			headers,
 			body: JSON.stringify({
 				mode: "0011",
 				payerReference,
-				callbackURL: config.bkash.callback_url,
+				callbackURL: config.bkash_callback_url,
 				amount: amount.toString(),
 				currency: "BDT",
 				intent: "sale",
@@ -197,7 +197,7 @@ export const executePayment = async (
 	const headers = await getBkashAuthHeaders();
 
 	const executeResponse = await fetch(
-		`${config.bkash.base_url}/tokenized/checkout/execute`,
+		`${config.bkash_base_url}/tokenized/checkout/execute`,
 		{
 			method: "POST",
 			headers,

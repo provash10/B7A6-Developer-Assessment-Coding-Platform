@@ -21,7 +21,7 @@ export const globalErrorHandler: ErrorRequestHandler = (
 	res: Response,
 	_next: NextFunction,
 ) => {
-	if (config.env === "development") {
+	if (config.node_env === "development") {
 		// console.log("Error from Global Error Handler", err);
 	}
 
@@ -104,7 +104,7 @@ export const globalErrorHandler: ErrorRequestHandler = (
 		statusCode,
 		message,
 		errorSources,
-		stack: config.env === "development" ? err?.stack : undefined,
+		stack: config.node_env === "development" ? err?.stack : undefined,
 	});
 };
 
