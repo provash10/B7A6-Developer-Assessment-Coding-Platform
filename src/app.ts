@@ -5,6 +5,8 @@ import express, {
 	type Request,
 	type Response,
 } from "express";
+import { rateLimit } from "express-rate-limit";
+import helmet from "helmet";
 import config from "./app/config";
 import { globalErrorHandler } from "./app/middleware/globalErrorHandler";
 import { notFound } from "./app/middleware/notFound";
@@ -18,6 +20,31 @@ import { QuestionRoutes } from "./app/modules/question/question.route";
 import { UserRoutes } from "./app/modules/user/user.route";
 
 const app: Application = express();
+
+// Security headers with helmet
+app.use(helmet());
+
+// Rate limiting to prevent API abuse
+const limiter = rateLimit({
+	windowMs: 15 * 60 * 1000, // 15 minutes
+	limit: 100, // Limit each IP to 100 requests per 15 minutes
+	standardHeaders: "draft-7",
+	legacyHeaders: false,
+	message: {
+		success: false,
+		message:
+			"Too many requests from this IP, please try again after 15 minutes.",
+		errors: [
+			{
+				path: "",
+				message: "Rate limit exceeded. Please try again later.",
+			},
+		],
+	},
+});
+
+// Apply rate limiting to all API routes
+app.use("/api", limiter);
 
 // console.log("initializing express application setup");
 

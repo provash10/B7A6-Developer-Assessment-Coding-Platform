@@ -103,6 +103,7 @@ export const globalErrorHandler: ErrorRequestHandler = (
 		success: false,
 		statusCode,
 		message,
+		errors: errorSources,
 		errorSources,
 		stack: config.node_env === "development" ? err?.stack : undefined,
 	});
