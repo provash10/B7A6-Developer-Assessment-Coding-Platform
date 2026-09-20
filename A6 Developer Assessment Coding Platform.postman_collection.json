@@ -1,7 +1,7 @@
 {
   "info": {
     "_postman_id": "a8c23608-090b-494a-aeb1-9e6fac170e20",
-    "name": "A6 Developer Assessment Coding Platform (Full Master Collection)",
+    "name": "A6 Developer Assessment Coding Platform",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "45096706",
     "_collection_link": "https://go.postman.co/collection/45096706-a8c23608-090b-494a-aeb1-9e6fac170e20?source=collection_link"
@@ -75,17 +75,29 @@
           "response": []
         },
         {
-          "name": "Get All Users (Admin)",
+          "name": "Upload Profile Image",
           "request": {
-            "method": "GET",
+            "method": "PATCH",
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer {{admin_token}}"
+                "value": "{{bearer_token_07wy}}"
               }
             ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "profileImage",
+                  "type": "file",
+                  "src": [
+                    "/C:/Users/Computer Solution/Downloads/22.JPG"
+                  ]
+                }
+              ]
+            },
             "url": {
-              "raw": "http://localhost:5000/api/v1/users?page=1&limit=10",
+              "raw": "http://localhost:5000/api/v1/users/profile-image",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -94,20 +106,10 @@
               "path": [
                 "api",
                 "v1",
-                "users"
-              ],
-              "query": [
-                {
-                  "key": "page",
-                  "value": "1"
-                },
-                {
-                  "key": "limit",
-                  "value": "10"
-                }
+                "users",
+                "profile-image"
               ]
-            },
-            "description": "Admin retrieves all users with pagination and filtering"
+            }
           },
           "response": []
         }
@@ -126,13 +128,13 @@
                 "value": "application/json"
               },
               {
-                "key": "",
+                "key": "Authorization",
                 "value": ""
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"email\" :\"lina@gmail.com\",\n  \"password\": \"Password@123\"\n    \n}",
+              "raw": "{\n    \"email\" :\"lina@gmail.com\",\n  \"password\": \"Password@100\"\n    \n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -163,7 +165,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"name\": \"Pintu Candidate\",\r\n  \"email\": \"pintu@gmail.com\",\r\n  \"password\": \"Password@123\",\r\n  \"phone\": \"+8801712345689\",\r\n  \"role\": \"CANDIDATE\",\r\n  \"skills\": [\"JavaScript\",\"Ts\",\"nextjs\", \"Express\"],\r\n  \"experienceYears\": 3\r\n}\r\n\r\n",
+              "raw": "{\r\n  \"name\": \"Rumel\",\r\n  \"email\": \"rujnu20@gmail.com\",\r\n  \"password\": \"Password@100\",\r\n  \"phone\": \"+8801712345689\",\r\n  \"role\": \"CANDIDATE\",\r\n  \"skills\": [\"JavaScript\",\"Ts\",\"nextjs\", \"Express\"],\r\n  \"experienceYears\": 3\r\n}\r\n\r\n",
               "options": {
                 "raw": {
                   "language": "json"
@@ -343,6 +345,78 @@
                 "v1",
                 "auth",
                 "google-login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Forgot Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{bearer_token_07wy}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"email\": \"rujnu20@gmail.com\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/v1/auth/forgot-password",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "forgot-password"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reset Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{bearer_token_07wy}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"email\": \"rujnu20@gmail.com\",\r\n  \"otp\": \"211735\",\r\n  \"newPassword\": \"Password@100\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/v1/auth/reset-password",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "reset-password"
               ]
             }
           },
@@ -1050,43 +1124,6 @@
       "name": "Attempt",
       "item": [
         {
-          "name": "Get My Attempts",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer "
-              }
-            ],
-            "url": {
-              "raw": "http://localhost:5000/api/v1/attempts/my-attempts?page=1&limit=10",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "5000",
-              "path": [
-                "api",
-                "v1",
-                "attempts",
-                "my-attempts"
-              ],
-              "query": [
-                {
-                  "key": "page",
-                  "value": "1"
-                },
-                {
-                  "key": "limit",
-                  "value": "10"
-                }
-              ]
-            }
-          },
-          "response": []
-        },
-        {
           "name": "Start Exam",
           "request": {
             "method": "POST",
@@ -1439,214 +1476,6 @@
           "response": []
         }
       ]
-    },
-    {
-      "name": "Admin",
-      "item": [
-        {
-          "name": "1. Admin Dashboard Stats",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{admin_token}}",
-                "type": "text"
-              }
-            ],
-            "url": {
-              "raw": "http://localhost:5000/api/v1/admin/dashboard-stats",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "5000",
-              "path": [
-                "api",
-                "v1",
-                "admin",
-                "dashboard-stats"
-              ]
-            },
-            "description": "Fetches overall system analytics including users count by role, active assessments count, question count, exam attempt pass rates, and total revenue in BDT from successful payments."
-          },
-          "response": []
-        },
-        {
-          "name": "2. Get Audit Logs (Paginated)",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{admin_token}}",
-                "type": "text"
-              }
-            ],
-            "url": {
-              "raw": "http://localhost:5000/api/v1/admin/audit-logs?page=1&limit=10",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "5000",
-              "path": [
-                "api",
-                "v1",
-                "admin",
-                "audit-logs"
-              ],
-              "query": [
-                {
-                  "key": "page",
-                  "value": "1"
-                },
-                {
-                  "key": "limit",
-                  "value": "10"
-                }
-              ]
-            },
-            "description": "Retrieves system audit logs sorted by newest first with pagination and user performer details."
-          },
-          "response": []
-        },
-        {
-          "name": "3. Get Audit Logs (Filter by Entity & Action)",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{admin_token}}",
-                "type": "text"
-              }
-            ],
-            "url": {
-              "raw": "http://localhost:5000/api/v1/admin/audit-logs?entityType=USER&action=USER_ROLE_UPDATED&page=1&limit=10",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "5000",
-              "path": [
-                "api",
-                "v1",
-                "admin",
-                "audit-logs"
-              ],
-              "query": [
-                {
-                  "key": "entityType",
-                  "value": "USER"
-                },
-                {
-                  "key": "action",
-                  "value": "USER_ROLE_UPDATED"
-                },
-                {
-                  "key": "page",
-                  "value": "1"
-                },
-                {
-                  "key": "limit",
-                  "value": "10"
-                }
-              ]
-            },
-            "description": "Filters audit logs by entityType (e.g. USER, ASSESSMENT) and action."
-          },
-          "response": []
-        },
-        {
-          "name": "4. Get Audit Logs (Search Term)",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{admin_token}}",
-                "type": "text"
-              }
-            ],
-            "url": {
-              "raw": "http://localhost:5000/api/v1/admin/audit-logs?searchTerm=ASSESSMENT&page=1&limit=10",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "5000",
-              "path": [
-                "api",
-                "v1",
-                "admin",
-                "audit-logs"
-              ],
-              "query": [
-                {
-                  "key": "searchTerm",
-                  "value": "ASSESSMENT"
-                },
-                {
-                  "key": "page",
-                  "value": "1"
-                },
-                {
-                  "key": "limit",
-                  "value": "10"
-                }
-              ]
-            },
-            "description": "Searches audit logs by keyword matching action, entityType, or entityId."
-          },
-          "response": []
-        },
-        {
-          "name": "5. Update User Role (Triggers Audit Log)",
-          "request": {
-            "method": "PATCH",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{admin_token}}",
-                "type": "text"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json",
-                "type": "text"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"role\": \"RECRUITER\"\n}"
-            },
-            "url": {
-              "raw": "http://localhost:5000/api/v1/users/:id/role",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "5000",
-              "path": [
-                "api",
-                "v1",
-                "users",
-                ":id",
-                "role"
-              ],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "USER_ID_HERE"
-                }
-              ]
-            },
-            "description": "Admin updates a user's role (ADMIN, RECRUITER, CANDIDATE). This action automatically inserts a new entry into AuditLog."
-          },
-          "response": []
-        }
-      ]
     }
   ],
   "variable": [
@@ -1812,6 +1641,14 @@
     },
     {
       "key": "google_oauth_token_00nj",
+      "secret": true
+    },
+    {
+      "key": "bearer_token_07wy",
+      "secret": true
+    },
+    {
+      "key": "json_web_token_0fqk",
       "secret": true
     }
   ]

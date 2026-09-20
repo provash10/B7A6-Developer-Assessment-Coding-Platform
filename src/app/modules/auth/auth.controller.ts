@@ -12,13 +12,13 @@ export const register = catchAsync(async (req: Request, res: Response) => {
 		httpOnly: true,
 		secure: process.env.NODE_ENV === "production",
 		sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-		maxAge: 1000 * 60 * 60 * 24, // 24 hours
+		maxAge: 1000 * 60 * 60 * 24,
 	});
 	res.cookie("refreshToken", refreshToken, {
 		httpOnly: true,
 		secure: process.env.NODE_ENV === "production",
 		sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-		maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+		maxAge: 1000 * 60 * 60 * 24 * 7,
 	});
 
 	sendResponse(res, {
@@ -38,13 +38,13 @@ export const login = catchAsync(async (req: Request, res: Response) => {
 		httpOnly: true,
 		secure: process.env.NODE_ENV === "production",
 		sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-		maxAge: 1000 * 60 * 60 * 24, // 24 hours
+		maxAge: 1000 * 60 * 60 * 24,
 	});
 	res.cookie("refreshToken", refreshToken, {
 		httpOnly: true,
 		secure: process.env.NODE_ENV === "production",
 		sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-		maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+		maxAge: 1000 * 60 * 60 * 24 * 7,
 	});
 
 	sendResponse(res, {
@@ -92,13 +92,13 @@ export const googleLogin = catchAsync(async (req: Request, res: Response) => {
 		httpOnly: true,
 		secure: process.env.NODE_ENV === "production",
 		sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-		maxAge: 1000 * 60 * 60 * 24, // 24 hours
+		maxAge: 1000 * 60 * 60 * 24,
 	});
 	res.cookie("refreshToken", refreshToken, {
 		httpOnly: true,
 		secure: process.env.NODE_ENV === "production",
 		sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-		maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+		maxAge: 1000 * 60 * 60 * 24 * 7,
 	});
 
 	sendResponse(res, {

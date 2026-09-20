@@ -22,8 +22,8 @@ declare global {
 	}
 }
 
-// checkAuth(UserRole.ADMIN, UserRole.RECRUITER, UserRole.CANDIDATE)
-// checkAuth() => ...requiredRoles => [UserRole.ADMIN, UserRole.RECRUITER]
+// checkauth(userrole.admin, userrole.recruiter, userrole.candidate)
+// checkauth() => ...requiredroles => [userrole.admin, userrole.recruiter]
 export const checkAuth = (...requiredRoles: UserRole[]) => {
 	return catchAsync(
 		async (req: Request, _res: Response, next: NextFunction) => {

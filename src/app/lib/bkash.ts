@@ -1,5 +1,6 @@
 import config from "../config";
 import AppError from "../utils/AppError";
+import { redisClient } from "./redis";
 
 interface IBkashGrantTokenResponse {
 	statusCode?: string;
@@ -10,22 +11,63 @@ interface IBkashGrantTokenResponse {
 	refresh_token?: string;
 }
 
-let cachedIdToken: string | null = null;
-let tokenExpiresAt = 0;
+const ID_TOKEN_KEY = "bkash:idToken";
+const REFRESH_TOKEN_KEY = "bkash:refreshToken";
 
-/**
- * Generates and returns a valid bKash id_token.
- * Uses in-memory caching with TTL (1 hour) to prevent redundant token requests.
- */
+// generates and returns a valid bkash id_token cached in redis
 export const getBkashIdToken = async (): Promise<string> => {
-	const now = Date.now();
-
-	// Return cached token if valid for at least 5 more minutes (300,000 ms)
-	if (cachedIdToken && tokenExpiresAt - now > 300000) {
-		return cachedIdToken;
-	}
-
 	try {
+		let bkashIdToken = await redisClient.get(ID_TOKEN_KEY);
+		const bkashIdTokenTTL = await redisClient.ttl(ID_TOKEN_KEY);
+
+		const bkashRefreshToken = await redisClient.get(REFRESH_TOKEN_KEY);
+		const bkashRefreshTokenTTL = await redisClient.ttl(REFRESH_TOKEN_KEY);
+
+		// if id token is expired and valid refresh token exists
+		if (
+			(bkashIdTokenTTL <= 600 || !bkashIdToken) &&
+			bkashRefreshToken &&
+			bkashRefreshTokenTTL > 600
+		) {
+			const refreshTokenResponse = await fetch(
+				`${config.bkash_base_url}/tokenized/checkout/token/refresh`,
+				{
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+						Accept: "application/json",
+						username: config.bkash_username,
+						password: config.bkash_password,
+					},
+					body: JSON.stringify({
+						app_key: config.bkash_app_key,
+						app_secret: config.bkash_app_secret,
+						refresh_token: bkashRefreshToken,
+					}),
+				},
+			);
+
+			if (!refreshTokenResponse.ok) {
+				throw new AppError(500, "bKash Refresh Token Grant Failed");
+			}
+
+			const bkashRefreshTokenResult =
+				(await refreshTokenResponse.json()) as IBkashGrantTokenResponse;
+			bkashIdToken = bkashRefreshTokenResult.id_token as string;
+
+			await redisClient.set(ID_TOKEN_KEY, bkashIdToken, {
+				EX: 60 * 60,
+			});
+
+			return bkashIdToken;
+		}
+
+		// if id token is still valid with ttl remaining
+		if (bkashIdToken && bkashIdTokenTTL > 600) {
+			return bkashIdToken;
+		}
+
+		// otherwise grant a new pair of tokens
 		const response = await fetch(
 			`${config.bkash_base_url}/tokenized/checkout/token/grant`,
 			{
@@ -60,11 +102,19 @@ export const getBkashIdToken = async (): Promise<string> => {
 			);
 		}
 
-		cachedIdToken = data.id_token;
-		// default expires_in is 3600 seconds (1 hour)
-		tokenExpiresAt = now + (data.expires_in || 3600) * 1000;
+		// store id token in redis
+		await redisClient.set(ID_TOKEN_KEY, data.id_token, {
+			EX: 60 * 60,
+		});
 
-		return cachedIdToken;
+		// store refresh token in redis
+		if (data.refresh_token) {
+			await redisClient.set(REFRESH_TOKEN_KEY, data.refresh_token, {
+				EX: 60 * 60 * 24 * 28,
+			});
+		}
+
+		return data.id_token;
 	} catch (error: unknown) {
 		if (error instanceof AppError) {
 			throw error;
@@ -75,9 +125,7 @@ export const getBkashIdToken = async (): Promise<string> => {
 	}
 };
 
-/**
- * Returns pre-configured headers required for bKash authenticated API calls (create, execute, query).
- */
+// returns pre-configured headers required for bkash authenticated api calls
 export const getBkashAuthHeaders = async (): Promise<
 	Record<string, string>
 > => {

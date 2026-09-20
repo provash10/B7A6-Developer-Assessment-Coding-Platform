@@ -21,13 +21,13 @@ import { UserRoutes } from "./app/modules/user/user.route";
 
 const app: Application = express();
 
-// Security headers with helmet
+// security headers with helmet
 app.use(helmet());
 
-// Rate limiting to prevent API abuse
+// rate limiting to prevent api abuse
 const limiter = rateLimit({
-	windowMs: 15 * 60 * 1000, // 15 minutes
-	limit: 100, // Limit each IP to 100 requests per 15 minutes
+	windowMs: 15 * 60 * 1000,
+	limit: 100,
 	standardHeaders: "draft-7",
 	legacyHeaders: false,
 	message: {
@@ -43,7 +43,7 @@ const limiter = rateLimit({
 	},
 });
 
-// Apply rate limiting to all API routes
+// apply rate limiting to all api routes
 app.use("/api", limiter);
 
 // console.log("initializing express application setup");

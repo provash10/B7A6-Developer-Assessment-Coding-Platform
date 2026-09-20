@@ -85,7 +85,7 @@ export const startAttempt = async (
 		startedAt.getTime() + attempt.assessment.durationMinutes * 60 * 1000,
 	);
 
-	// update attempt to IN_PROGRESS
+	// update attempt to in_progress
 	const updatedAttempt = await prisma.candidateAttempt.update({
 		where: { id: attemptId },
 		data: {
@@ -196,11 +196,11 @@ export const getAttemptQuestions = async (
 			const q = aq.question;
 			const currentSub = attempt.submissions.find((s) => s.questionId === q.id);
 
-			// sanitize options for MCQ
+			// sanitize options for mcq
 			let sanitizedOptions: unknown = q.options;
 			if (q.type === "MCQ" && q.options) {
 				if (Array.isArray(q.options)) {
-					// if array of objects with isCorrect, strip isCorrect
+					// if array of objects with iscorrect, strip iscorrect
 					sanitizedOptions = q.options.map((opt: unknown) => {
 						if (typeof opt === "object" && opt !== null && "text" in opt) {
 							return (opt as { text: string }).text;
@@ -216,7 +216,7 @@ export const getAttemptQuestions = async (
 				}
 			}
 
-			// sanitize test cases for CODING
+			// sanitize test cases for coding
 			let sanitizedTestCases: unknown;
 			if (q.type === "CODING" && q.testCases) {
 				if (Array.isArray(q.testCases)) {
@@ -416,7 +416,7 @@ export const submitAnswer = async (
 		}
 	} else if (question.type === "CODING") {
 		if (payload.submittedCode && payload.submittedCode.trim().length > 0) {
-			executionTime = Math.floor(Math.random() * 45) + 25; // 25ms - 70ms simulated run time
+			executionTime = Math.floor(Math.random() * 45) + 25;
 			scoreObtained = question.marks;
 			verdict = "ACCEPTED";
 		} else {
@@ -424,7 +424,7 @@ export const submitAnswer = async (
 			verdict = "EMPTY_CODE";
 		}
 	} else {
-		// DESCRIPTIVE or other
+		// descriptive or other
 		scoreObtained = 0;
 		verdict = "SUBMITTED";
 	}
@@ -703,7 +703,7 @@ export const getAttemptResult = async (
 			);
 		}
 	}
-	// ADMIN has unrestricted view
+	// admin has unrestricted view
 
 	if (attempt.status !== "SUBMITTED") {
 		throw new AppError(

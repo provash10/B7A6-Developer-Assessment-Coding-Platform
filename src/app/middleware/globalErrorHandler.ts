@@ -22,12 +22,12 @@ export const globalErrorHandler: ErrorRequestHandler = (
 	_next: NextFunction,
 ) => {
 	if (config.node_env === "development") {
-		// console.log("Error from Global Error Handler", err);
+		// console.log("error from global error handler", err);
 	}
 
 	let statusCode = 500;
 	let message = "Something went wrong!";
-	// let errorDetails = err.stack
+	// let errordetails = err.stack
 	let errorSources: TErrorSources = [
 		{
 			path: "",

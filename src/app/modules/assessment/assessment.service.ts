@@ -15,7 +15,7 @@ export const createAssessment = async (
 	userId: string,
 	payload: ICreateAssessmentInput,
 ) => {
-	// console.log("Creating assessment for userId:", userId);
+	// console.log("creating assessment for userid:", userid);
 	let recruiterProfile = await prisma.recruiterProfile.findUnique({
 		where: { userId },
 	});

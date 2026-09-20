@@ -1,4 +1,5 @@
 import type { Request, Response } from "express";
+import AppError from "../../utils/AppError";
 import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import { UserService } from "./user.service";
@@ -65,9 +66,84 @@ export const updateUserRole = catchAsync(
 	},
 );
 
+export const uploadProfileImage = catchAsync(
+	async (req: Request, res: Response) => {
+		if (!req.file) {
+			throw new AppError(400, "No file provided. Please upload an image.");
+		}
+
+		const userId = req.user?.userId;
+		if (!userId) {
+			throw new AppError(401, "Unauthorized access. User ID missing.");
+		}
+
+		const result = await UserService.uploadProfileImage(
+			req.file.buffer,
+			userId,
+		);
+
+		sendResponse(res, {
+			statusCode: 200,
+			success: true,
+			message: "Profile image uploaded successfully",
+			data: result,
+		});
+	},
+);
+
+export const uploadResume = catchAsync(
+	async (req: Request, res: Response) => {
+		if (!req.file) {
+			throw new AppError(400, "No file provided. Please upload your resume.");
+		}
+
+		const userId = req.user?.userId;
+		if (!userId) {
+			throw new AppError(401, "Unauthorized access. User ID missing.");
+		}
+
+		const result = await UserService.uploadResume(req.file.buffer, userId);
+
+		sendResponse(res, {
+			statusCode: 200,
+			success: true,
+			message: "Resume uploaded successfully",
+			data: result,
+		});
+	},
+);
+
+export const uploadCompanyLogo = catchAsync(
+	async (req: Request, res: Response) => {
+		if (!req.file) {
+			throw new AppError(400, "No file provided. Please upload company logo.");
+		}
+
+		const userId = req.user?.userId;
+		if (!userId) {
+			throw new AppError(401, "Unauthorized access. User ID missing.");
+		}
+
+		const result = await UserService.uploadCompanyLogo(
+			req.file.buffer,
+			userId,
+		);
+
+		sendResponse(res, {
+			statusCode: 200,
+			success: true,
+			message: "Company logo uploaded successfully",
+			data: result,
+		});
+	},
+);
+
 export const UserController = {
 	getMyProfile,
 	updateMyProfile,
 	getAllUsers,
 	updateUserRole,
+	uploadProfileImage,
+	uploadResume,
+	uploadCompanyLogo,
 };

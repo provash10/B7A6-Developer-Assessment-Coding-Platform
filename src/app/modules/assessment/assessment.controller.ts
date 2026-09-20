@@ -6,7 +6,7 @@ import { AssessmentService } from "./assessment.service";
 export const createAssessment = catchAsync(
 	async (req: Request, res: Response) => {
 		const userId = req.user?.userId as string;
-		// console.log("Controller creating assessment for user:", userId);
+		// console.log("controller creating assessment for user:", userid);
 		const result = await AssessmentService.createAssessment(userId, req.body);
 
 		sendResponse(res, {
@@ -20,7 +20,7 @@ export const createAssessment = catchAsync(
 
 export const getAllAssessments = catchAsync(
 	async (req: Request, res: Response) => {
-		// console.log("Controller fetching assessments with query:", req.query);
+		// console.log("controller fetching assessments with query:", req.query);
 		const result = await AssessmentService.getAllAssessments(req.query);
 
 		sendResponse(res, {
@@ -36,7 +36,7 @@ export const getAllAssessments = catchAsync(
 export const getSingleAssessment = catchAsync(
 	async (req: Request, res: Response) => {
 		const { id } = req.params;
-		// console.log("Controller fetching assessment with ID:", id);
+		// console.log("controller fetching assessment with id:", id);
 		const result = await AssessmentService.getAssessmentById(id as string);
 
 		sendResponse(res, {
@@ -51,7 +51,7 @@ export const getSingleAssessment = catchAsync(
 export const updateAssessment = catchAsync(
 	async (req: Request, res: Response) => {
 		const { id } = req.params;
-		// console.log("Controller updating assessment ID:", id, "payload:", req.body);
+		// console.log("controller updating assessment id:", id, "payload:", req.body);
 		const result = await AssessmentService.updateAssessment(
 			id as string,
 			req.body,
@@ -69,7 +69,7 @@ export const updateAssessment = catchAsync(
 export const addQuestionToAssessment = catchAsync(
 	async (req: Request, res: Response) => {
 		const { id } = req.params;
-		// console.log("Controller adding question to assessment ID:", id);
+		// console.log("controller adding question to assessment id:", id);
 		const result = await AssessmentService.addQuestionToAssessment(
 			id as string,
 			req.body,
@@ -87,7 +87,7 @@ export const addQuestionToAssessment = catchAsync(
 export const removeQuestionFromAssessment = catchAsync(
 	async (req: Request, res: Response) => {
 		const { id, questionId } = req.params;
-		// console.log("Controller removing question:", questionId, "from assessment:", id);
+		// console.log("controller removing question:", questionid, "from assessment:", id);
 		const result = await AssessmentService.removeQuestionFromAssessment(
 			id as string,
 			questionId as string,

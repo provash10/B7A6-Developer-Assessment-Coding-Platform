@@ -39,7 +39,7 @@ export const initiatePayment = catchAsync(
 
 export const handlePaymentCallback = catchAsync(
 	async (req: Request, res: Response) => {
-		// bKash sends paymentID and status via query params or request body
+		// bkash sends paymentid and status via query params or request body
 		const paymentId = (req.query.paymentID || req.body.paymentID) as string;
 		const status = (req.query.status || req.body.status) as string;
 

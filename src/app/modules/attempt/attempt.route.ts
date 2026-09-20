@@ -6,7 +6,7 @@ import { AttemptValidation } from "./attempt.validation";
 
 const router = Router();
 
-// Candidate gets all their personal assessment attempts
+// candidate gets all their personal assessment attempts
 router.get("/my", checkAuth("CANDIDATE"), AttemptController.getMyAttempts);
 router.get(
 	"/my-attempts",
@@ -14,21 +14,21 @@ router.get(
 	AttemptController.getMyAttempts,
 );
 
-// Candidate starts assessment attempt and activates timer
+// candidate starts assessment attempt and activates timer
 router.post(
 	"/:id/start",
 	checkAuth("CANDIDATE"),
 	AttemptController.startAttempt,
 );
 
-// Candidate gets examination questions during active attempt
+// candidate gets examination questions during active attempt
 router.get(
 	"/:id/questions",
 	checkAuth("CANDIDATE"),
 	AttemptController.getAttemptQuestions,
 );
 
-// Candidate submits answer or code for a specific question
+// candidate submits answer or code for a specific question
 router.post(
 	"/:id/submit-answer",
 	checkAuth("CANDIDATE"),
@@ -36,21 +36,21 @@ router.post(
 	AttemptController.submitAnswer,
 );
 
-// Candidate records an anti-cheat event (e.g. Tab switch / window blur)
+// candidate records an anti-cheat event (e.g. tab switch / window blur)
 router.post(
 	"/:id/anti-cheat",
 	checkAuth("CANDIDATE"),
 	AttemptController.recordAntiCheatFlag,
 );
 
-// Candidate finishes assessment and calculates final score
+// candidate finishes assessment and calculates final score
 router.post(
 	"/:id/finish",
 	checkAuth("CANDIDATE"),
 	AttemptController.finishAttempt,
 );
 
-// View assessment attempt result (Candidate self, assessment Recruiter, or Admin)
+// view assessment attempt result (candidate self, assessment recruiter, or admin)
 router.get(
 	"/:id/result",
 	checkAuth("CANDIDATE", "RECRUITER", "ADMIN"),

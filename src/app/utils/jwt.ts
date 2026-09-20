@@ -23,7 +23,7 @@ export const verifyToken = (
 	try {
 		return jwt.verify(token, secret);
 	} catch (error: any) {
-		// console.log("Token verification failed:", error);
+		// console.log("token verification failed:", error);
 		throw error;
 	}
 };

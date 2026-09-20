@@ -4,6 +4,7 @@ import config from "../../config";
 import { googleClient } from "../../lib/googleAuth";
 import { sendEmail } from "../../lib/nodemailer";
 import { prisma } from "../../lib/prisma";
+import { redisClient } from "../../lib/redis";
 import AppError from "../../utils/AppError";
 import jwtUtils from "../../utils/jwt";
 import type {
@@ -61,7 +62,7 @@ export const registerUser = async (payload: IRegisterUserInput) => {
 		return newUser;
 	});
 
-	// Send welcome email (optional/non-blocking)
+	// send welcome email (optional/non-blocking)
 	sendEmail({
 		to: result.email,
 		subject: "Welcome to Developer Assessment Platform",
@@ -73,7 +74,7 @@ export const registerUser = async (payload: IRegisterUserInput) => {
 			expirationMinutes: 10,
 		},
 	}).catch((err) => {
-		// console.log("Email sending error:", err);
+		// console.log("email sending error:", err);
 	});
 
 	const jwtPayload = {
@@ -172,6 +173,12 @@ export const forgotPassword = async (payload: IForgotPasswordInput) => {
 	}
 
 	const otp = Math.floor(100000 + Math.random() * 900000).toString();
+	const key = `forgot-password-otp:${user.email}`;
+	const expirationSeconds = 5 * 60;
+
+	await redisClient.set(key, otp, {
+		EX: expirationSeconds,
+	});
 
 	await sendEmail({
 		to: user.email,
@@ -180,7 +187,7 @@ export const forgotPassword = async (payload: IForgotPasswordInput) => {
 		templateData: {
 			name: user.name,
 			otp,
-			expirationMinutes: 10,
+			expirationMinutes: expirationSeconds / 60,
 		},
 	});
 
@@ -196,12 +203,26 @@ export const resetPassword = async (payload: IResetPasswordInput) => {
 		throw new AppError(404, "User not found.");
 	}
 
-	const newPasswordHash = await bcrypt.hash(payload.newPassword, 10);
+	const key = `forgot-password-otp:${user.email}`;
+	const redisOtp = await redisClient.get(key);
+
+	if (!redisOtp) {
+		throw new AppError(400, "Invalid or Expired OTP");
+	}
+
+	if (redisOtp !== payload.otp) {
+		throw new AppError(400, "OTP Does Not Match");
+	}
+
+	const saltRounds = Number(config.bcrypt_salt_rounds) || 10;
+	const newPasswordHash = await bcrypt.hash(payload.newPassword, saltRounds);
 
 	await prisma.user.update({
 		where: { id: user.id },
 		data: { passwordHash: newPasswordHash },
 	});
+
+	await redisClient.del(key);
 
 	sendEmail({
 		to: user.email,
@@ -209,7 +230,7 @@ export const resetPassword = async (payload: IResetPasswordInput) => {
 		templateName: "reset-password-success",
 		templateData: { name: user.name },
 	}).catch((err) => {
-		// console.log("Email error:", err);
+		// console.log("email error:", err);
 	});
 
 	return { message: "Password reset completed successfully." };
@@ -238,7 +259,7 @@ export const googleLogin = async (payload: IGoogleLoginInput) => {
 			});
 			googlePayload = ticket.getPayload();
 		} catch (fallbackError) {
-			console.log("Google ID Token Verification Failed", fallbackError);
+			// console.log("google id token verification failed", fallbackerror);
 			throw new AppError(401, "Invalid Or Expired Google Id Token");
 		}
 	}
@@ -281,7 +302,7 @@ export const googleLogin = async (payload: IGoogleLoginInput) => {
 			},
 		});
 
-		// Send welcome email (non-blocking)
+		// send welcome email (non-blocking)
 		sendEmail({
 			to: user.email,
 			subject: "Welcome to Developer Assessment Platform",

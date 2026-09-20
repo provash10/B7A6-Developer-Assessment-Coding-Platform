@@ -14,5 +14,3 @@ export class AppError extends Error {
 }
 
 export default AppError;
-
-// throw new AppError(404, "Not Found")

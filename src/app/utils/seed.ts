@@ -10,7 +10,7 @@ async function seed() {
 		const recruiterPassword = await bcrypt.hash(config.recruiter_password, 10);
 		const candidatePassword = await bcrypt.hash(config.candidate_password, 10);
 
-		// 1. Seed Admin User
+		// seed admin user
 		const adminUser = await prisma.user.upsert({
 			where: { email: config.admin_email },
 			update: { passwordHash: adminPassword },
@@ -24,7 +24,7 @@ async function seed() {
 		});
 		console.log(`✅ Admin User Seeded: ${adminUser.email}`);
 
-		// 2. Seed Recruiter User & Profile
+		// seed recruiter user and profile
 		const recruiterUser = await prisma.user.upsert({
 			where: { email: config.recruiter_email },
 			update: { passwordHash: recruiterPassword },
@@ -48,7 +48,7 @@ async function seed() {
 		});
 		console.log(`✅ Recruiter User & Profile Seeded: ${recruiterUser.email}`);
 
-		// 3. Seed Candidate User & Profile
+		// seed candidate user and profile
 		const candidateUser = await prisma.user.upsert({
 			where: { email: config.candidate_email },
 			update: { passwordHash: candidatePassword },
@@ -78,7 +78,7 @@ async function seed() {
 		});
 		console.log(`✅ Candidate User & Profile Seeded: ${candidateUser.email}`);
 
-		// 4. Seed Sample Questions
+		// seed sample questions
 		const mcqQuestion = await prisma.question.create({
 			data: {
 				title: "Prisma Multi-File Schema Support",
@@ -115,7 +115,7 @@ async function seed() {
 
 		console.log("✅ Sample Questions Seeded.");
 
-		// 5. Seed Sample Assessment (if recruiter profile exists)
+		// seed sample assessment
 		if (recruiterUser.recruiterProfile) {
 			const sampleAssessment = await prisma.assessment.create({
 				data: {

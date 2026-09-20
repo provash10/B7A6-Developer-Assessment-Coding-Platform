@@ -8,20 +8,13 @@ import type {
 	IPaymentFilterParams,
 } from "./payment.interface";
 
-/**
- * Step 1: getBkashToken
- * Retrieves a valid authentication id_token from bKash.
- */
+// get bkash token
 export const getBkashToken = async (): Promise<string> => {
 	const token = await getBkashIdToken();
 	return token;
 };
 
-/**
- * Step 2: initiatePayment
- * Initiates bKash payment session for buying recruiter assessment credits.
- * Calculates cost (1 credit = 5 BDT) and saves a PENDING PaymentTransaction record.
- */
+// initiate payment
 export const initiatePayment = async (
 	userId: string,
 	credits: number,
@@ -46,18 +39,18 @@ export const initiatePayment = async (
 		);
 	}
 
-	// 1 Credit = 5 BDT
+	// credit cost calculation
 	const pricePerCredit = 5;
 	const amount = credits * pricePerCredit;
 
-	// fetch authorized bKash headers
+	// fetch authorized bkash headers
 	const headers = await getBkashAuthHeaders();
 
 	const merchantInvoiceNumber = `INV-${Date.now()}`;
 	const payerReference =
 		recruiterProfile.user.email || recruiterProfile.companyName || "recruiter";
 
-	// request bKash checkout/create endpoint
+	// request bkash checkout/create endpoint
 	const createResponse = await fetch(
 		`${config.bkash_base_url}/tokenized/checkout/create`,
 		{
@@ -132,10 +125,7 @@ export const initiatePayment = async (
 	};
 };
 
-/**
- * Step 3: executePayment / handleCallback
- * Handles bKash payment verification, final execution, and credit allocation.
- */
+// execute payment callback
 export const executePayment = async (
 	paymentId: string,
 	status: string,
@@ -193,7 +183,7 @@ export const executePayment = async (
 		};
 	}
 
-	// status is success -> execute bKash payment
+	// status is success -> execute bkash payment
 	const headers = await getBkashAuthHeaders();
 
 	const executeResponse = await fetch(
@@ -225,7 +215,7 @@ export const executePayment = async (
 		amount?: string;
 	};
 
-	// verify bKash execution success
+	// verify bkash execution success
 	if (
 		executedResult.statusCode !== "0000" &&
 		executedResult.transactionStatus !== "Completed"
@@ -301,10 +291,7 @@ export const executePayment = async (
 	return result;
 };
 
-/**
- * Step 4: getMyTransactions
- * Retrieves paginated list of payment transactions made by the logged-in user.
- */
+// get my transactions
 export const getMyTransactions = async (
 	userId: string,
 	query: IPaymentFilterParams,
@@ -352,10 +339,7 @@ export const getMyTransactions = async (
 	};
 };
 
-/**
- * getAllTransactions (Admin only)
- * Retrieves all platform transactions with user details, filters, and pagination.
- */
+// get all transactions (admin only)
 export const getAllTransactions = async (query: IPaymentFilterParams) => {
 	const page = Number(query.page) || 1;
 	const limit = Number(query.limit) || 10;
@@ -408,10 +392,7 @@ export const getAllTransactions = async (query: IPaymentFilterParams) => {
 	};
 };
 
-/**
- * Step 5: getSingleTransaction
- * Retrieves detailed receipt/invoice for a specific transaction by id or transactionId.
- */
+// get single transaction
 export const getSingleTransaction = async (
 	idOrTxId: string,
 	userId: string,

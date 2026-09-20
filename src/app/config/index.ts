@@ -23,6 +23,15 @@ export default {
 	smtp_password: process.env.SMTP_PASSWORD!,
 	email_sender: process.env.EMAIL_SENDER!,
 
+	redis_user: process.env.REDIS_USER || "default",
+	redis_password: process.env.REDIS_PASSWORD!,
+	redis_host: process.env.REDIS_HOST!,
+	redis_port: process.env.REDIS_PORT || "6379",
+
+	cloudinary_cloud_name: process.env.CLOUDINARY_CLOUD_NAME!,
+	cloudinary_api_key: process.env.CLOUDINARY_API_KEY!,
+	cloudinary_api_secret: process.env.CLOUDINARY_API_SECRET!,
+
 	bkash_base_url: process.env.BKASH_BASE_URL!,
 	bkash_username: process.env.BKASH_USERNAME!,
 	bkash_password: process.env.BKASH_PASSWORD!,

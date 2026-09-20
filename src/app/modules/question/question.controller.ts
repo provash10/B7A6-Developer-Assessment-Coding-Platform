@@ -5,7 +5,7 @@ import { QuestionService } from "./question.service";
 
 export const createQuestion = catchAsync(
 	async (req: Request, res: Response) => {
-		// console.log("Creating question with payload:", req.body);
+		// console.log("creating question with payload:", req.body);
 		const result = await QuestionService.createQuestion(req.body);
 
 		sendResponse(res, {
@@ -19,7 +19,7 @@ export const createQuestion = catchAsync(
 
 export const getAllQuestions = catchAsync(
 	async (req: Request, res: Response) => {
-		// console.log("Fetching questions with query params:", req.query);
+		// console.log("fetching questions with query params:", req.query);
 		const result = await QuestionService.getAllQuestions(req.query);
 
 		sendResponse(res, {
@@ -35,7 +35,7 @@ export const getAllQuestions = catchAsync(
 export const getQuestionById = catchAsync(
 	async (req: Request, res: Response) => {
 		const { id } = req.params;
-		// console.log("Fetching question with ID:", id);
+		// console.log("fetching question with id:", id);
 		const result = await QuestionService.getQuestionById(id as string);
 
 		sendResponse(res, {
@@ -50,7 +50,7 @@ export const getQuestionById = catchAsync(
 export const updateQuestion = catchAsync(
 	async (req: Request, res: Response) => {
 		const { id } = req.params;
-		// console.log("Updating question ID:", id, "payload:", req.body);
+		// console.log("updating question id:", id, "payload:", req.body);
 		const result = await QuestionService.updateQuestion(id as string, req.body);
 
 		sendResponse(res, {
@@ -65,7 +65,7 @@ export const updateQuestion = catchAsync(
 export const deleteQuestion = catchAsync(
 	async (req: Request, res: Response) => {
 		const { id } = req.params;
-		// console.log("Deleting question with ID:", id);
+		// console.log("deleting question with id:", id);
 		const result = await QuestionService.deleteQuestion(id as string);
 
 		sendResponse(res, {
