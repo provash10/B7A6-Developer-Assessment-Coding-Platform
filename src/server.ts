@@ -1,5 +1,5 @@
 import type { Server } from "http";
-import app from "./app";
+import app from "./app.js";
 import config from "./app/config";
 import { prisma } from "./app/lib/prisma";
 import { redisClient } from "./app/lib/redis";
@@ -50,3 +50,6 @@ process.on("uncaughtException", async (err) => {
 	}
 	process.exit(1);
 });
+
+// export default express application
+export default app;
