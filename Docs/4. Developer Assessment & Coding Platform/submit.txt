@@ -1,0 +1,16 @@
+Project Name    : A6 Developer Assessment Coding Platform
+Backend Repo    : https://github.com/provash10/B7A6-Developer-Assessment-Coding-Platform
+Live API        : https://a6-developer-assessment-coding-plat.vercel.app
+API Docs        : https://documenter.getpostman.com/view/45096706/2sBYB1PUP2
+Demo Video      : https://drive.google.com/file/d/xyz/view
+
+Admin Email     : admin@100.com
+Recruiter email : recruiter-1@100.com
+Candidate email : lina@gmail.com
+
+Password@100 or Password@123
+
+ADMIN_EMAIL="admin@100.com"
+RECRUITER_EMAIL="recruiter@100.com"
+CANDIDATE_EMAIL="candidate@100.com"
+PASSWORD="Password@100"
