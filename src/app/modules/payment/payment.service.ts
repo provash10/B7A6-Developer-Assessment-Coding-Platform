@@ -1,5 +1,4 @@
 import config from "../../config";
-import { getBkashAuthHeaders, getBkashIdToken } from "../../lib/bkash";
 import { prisma } from "../../lib/prisma";
 import AppError from "../../utils/AppError";
 import type {
@@ -8,18 +7,79 @@ import type {
 	IPaymentFilterParams,
 } from "./payment.interface";
 
-// get bkash token
+// cache bkash auth token in memory or redis with expiry
+let cachedBkashToken: string | null = null;
+let tokenExpiresAt = 0;
+
+// generate or retrieve cached bkash id_token
 export const getBkashToken = async (): Promise<string> => {
-	const token = await getBkashIdToken();
-	return token;
+	const now = Date.now();
+	if (cachedBkashToken && now < tokenExpiresAt - 60000) {
+		return cachedBkashToken;
+	}
+
+	const tokenUrl = `${config.bkash_base_url}/tokenized/checkout/token/grant`;
+
+	const response = await fetch(tokenUrl, {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json",
+			Accept: "application/json",
+			username: config.bkash_username,
+			password: config.bkash_password,
+		},
+		body: JSON.stringify({
+			app_key: config.bkash_app_key,
+			app_secret: config.bkash_app_secret,
+		}),
+	});
+
+	if (!response.ok) {
+		const errorText = await response.text();
+		throw new AppError(
+			500,
+			`Failed to grant bKash token: ${response.status} ${errorText}`,
+		);
+	}
+
+	const data = (await response.json()) as {
+		id_token?: string;
+		expires_in?: number | string;
+		statusCode?: string;
+		statusMessage?: string;
+	};
+
+	if (data.statusCode !== "0000" || !data.id_token) {
+		throw new AppError(
+			500,
+			data.statusMessage || "bKash Token Generation Failed",
+		);
+	}
+
+	cachedBkashToken = data.id_token;
+	const expiresInMs = (Number(data.expires_in) || 3600) * 1000;
+	tokenExpiresAt = now + expiresInMs;
+
+	return cachedBkashToken;
 };
 
-// initiate payment
+// helper to get bkash common headers
+const getBkashAuthHeaders = async () => {
+	const token = await getBkashToken();
+	return {
+		"Content-Type": "application/json",
+		Accept: "application/json",
+		authorization: token,
+		"x-app-key": config.bkash_app_key,
+	};
+};
+
+// initiate bkash payment for buying assessment credits
 export const initiatePayment = async (
 	userId: string,
 	credits: number,
 ): Promise<IInitiatePaymentResponse> => {
-	// verify user has a recruiter profile
+	// verify user has a recruiter profile or candidate user
 	const recruiterProfile = await prisma.recruiterProfile.findUnique({
 		where: { userId },
 		include: {
@@ -32,11 +92,19 @@ export const initiatePayment = async (
 		},
 	});
 
-	if (!recruiterProfile) {
-		throw new AppError(
-			404,
-			"Recruiter profile not found. Only recruiters can purchase assessment credits.",
-		);
+	let payerReference = "customer";
+	if (recruiterProfile) {
+		payerReference =
+			recruiterProfile.user.email || recruiterProfile.companyName || "recruiter";
+	} else {
+		const user = await prisma.user.findUnique({
+			where: { id: userId },
+			select: { email: true, name: true },
+		});
+		if (!user) {
+			throw new AppError(404, "User not found.");
+		}
+		payerReference = user.email || user.name || "candidate";
 	}
 
 	// credit cost calculation
@@ -47,8 +115,6 @@ export const initiatePayment = async (
 	const headers = await getBkashAuthHeaders();
 
 	const merchantInvoiceNumber = `INV-${Date.now()}`;
-	const payerReference =
-		recruiterProfile.user.email || recruiterProfile.companyName || "recruiter";
 
 	// request bkash checkout/create endpoint
 	const createResponse = await fetch(
@@ -252,7 +318,7 @@ export const executePayment = async (
 			? details.credits
 			: Math.round(Number(transaction.amount) / 5);
 
-	// execute database transaction: update status & credit recruiter account
+	// execute database transaction: update status & credit recruiter account if recruiter
 	const result = await prisma.$transaction(async (tx) => {
 		const updatedTx = await tx.paymentTransaction.update({
 			where: { transactionId: paymentId },
@@ -267,14 +333,22 @@ export const executePayment = async (
 			},
 		});
 
-		const updatedRecruiter = await tx.recruiterProfile.update({
+		let newTotalCredits = 0;
+		const recruiter = await tx.recruiterProfile.findUnique({
 			where: { userId: transaction.userId },
-			data: {
-				credits: {
-					increment: creditsPurchased,
-				},
-			},
 		});
+
+		if (recruiter) {
+			const updatedRecruiter = await tx.recruiterProfile.update({
+				where: { userId: transaction.userId },
+				data: {
+					credits: {
+						increment: creditsPurchased,
+					},
+				},
+			});
+			newTotalCredits = updatedRecruiter.credits;
+		}
 
 		return {
 			transactionId: updatedTx.transactionId,
@@ -282,7 +356,7 @@ export const executePayment = async (
 			message:
 				"bKash payment executed successfully. Credits have been added to your profile.",
 			creditsPurchased,
-			newTotalCredits: updatedRecruiter.credits,
+			newTotalCredits,
 			trxID: executedResult.trxID,
 			amount: Number(transaction.amount),
 		};

@@ -125,13 +125,24 @@ export const updateUserRole = async (
 	performedBy?: string,
 	ipAddress?: string,
 ) => {
-	const user = await prisma.user.findUnique({ where: { id: userId } });
+	const user = await prisma.user.findFirst({
+		where: {
+			OR: [
+				{ id: userId },
+				{ email: { equals: userId, mode: "insensitive" } },
+			],
+		},
+		include: {
+			candidateProfile: true,
+			recruiterProfile: true,
+		},
+	});
 	if (!user) {
 		throw new AppError(404, "User not found.");
 	}
 
 	const updatedUser = await prisma.user.update({
-		where: { id: userId },
+		where: { id: user.id },
 		data: { role },
 		select: {
 			id: true,
@@ -142,17 +153,37 @@ export const updateUserRole = async (
 		},
 	});
 
+	// Ensure corresponding profile exists for new role
+	if (role === "RECRUITER" && !user.recruiterProfile) {
+		await prisma.recruiterProfile.create({
+			data: {
+				userId: user.id,
+				companyName: `${user.name} Tech`,
+				credits: 50,
+			},
+		});
+	} else if (role === "CANDIDATE" && !user.candidateProfile) {
+		await prisma.candidateProfile.create({
+			data: {
+				userId: user.id,
+				skills: [],
+			},
+		});
+	}
+
 	// record audit log entry for role change
 	if (performedBy) {
-		await createAuditLog({
-			userId: performedBy,
-			action: "USER_ROLE_UPDATED",
-			entityType: "USER",
-			entityId: userId,
-			oldValue: { role: user.role },
-			newValue: { role },
-			ipAddress: ipAddress ?? undefined,
-		});
+		try {
+			await createAuditLog({
+				userId: performedBy,
+				action: "USER_ROLE_UPDATED",
+				entityType: "USER",
+				entityId: user.id,
+				oldValue: { role: user.role },
+				newValue: { role },
+				ipAddress: ipAddress ?? undefined,
+			});
+		} catch {}
 	}
 
 	return updatedUser;

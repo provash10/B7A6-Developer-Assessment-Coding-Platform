@@ -1,3 +1,4 @@
+import config from "../../config";
 import type { Request, Response } from "express";
 import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
@@ -44,6 +45,21 @@ export const handlePaymentCallback = catchAsync(
 		const status = (req.query.status || req.body.status) as string;
 
 		const result = await PaymentService.executePayment(paymentId, status);
+
+		// If this is a browser GET redirect from the bKash checkout gateway
+		const isBrowserNavigation = req.method === "GET" && (req.headers.accept?.includes("text/html") || !req.xhr);
+		if (isBrowserNavigation) {
+			const frontendUrl = config.frontend_url || "http://localhost:3000";
+			if (result.status === "SUCCESS") {
+				return res.redirect(
+					`${frontendUrl}/payment/success?paymentID=${encodeURIComponent(result.transactionId || paymentId)}&trxID=${encodeURIComponent(result.trxID || "")}&amount=${result.amount || ""}&credits=${result.creditsPurchased || ""}&status=success`
+				);
+			} else {
+				return res.redirect(
+					`${frontendUrl}/payment/cancel?paymentID=${encodeURIComponent(paymentId || "")}&status=${encodeURIComponent(status || "cancel")}&message=${encodeURIComponent(result.message || "Payment cancelled")}`
+				);
+			}
+		}
 
 		sendResponse(res, {
 			statusCode: 200,

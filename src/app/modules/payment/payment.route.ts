@@ -13,10 +13,10 @@ router.get(
 	PaymentController.getBkashToken,
 );
 
-// recruiter initiates payment to buy credits
+// initiates payment to buy credits (open to all authenticated users)
 router.post(
 	"/initiate",
-	checkAuth("RECRUITER"),
+	checkAuth("RECRUITER", "CANDIDATE", "ADMIN"),
 	validateRequest(PaymentValidation.initiatePaymentZodSchema),
 	PaymentController.initiatePayment,
 );

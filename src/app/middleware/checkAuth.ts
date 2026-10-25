@@ -50,14 +50,7 @@ export const checkAuth = (...requiredRoles: UserRole[]) => {
 				throw new AppError(401, "Invalid or expired authorization token.");
 			}
 
-			const { userId, email, role } = decodedPayload;
-
-			if (requiredRoles.length && !requiredRoles.includes(role as UserRole)) {
-				throw new AppError(
-					403,
-					"Forbidden. You do not have permission to access this resource.",
-				);
-			}
+			const { userId, email } = decodedPayload;
 
 			const user = await prisma.user.findUnique({
 				where: {
@@ -69,6 +62,15 @@ export const checkAuth = (...requiredRoles: UserRole[]) => {
 				throw new AppError(
 					401,
 					"User no longer exists or account is inactive.",
+				);
+			}
+
+			// Check against live database user role so role promotion takes effect immediately
+			const activeRole = user.role;
+			if (requiredRoles.length && !requiredRoles.includes(activeRole as UserRole)) {
+				throw new AppError(
+					403,
+					"Forbidden. You do not have permission to access this resource.",
 				);
 			}
 
