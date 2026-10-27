@@ -11,8 +11,12 @@ async function main() {
 		await prisma.$connect();
 		console.log("Connected to the database successfully.");
 
-		await redisClient.connect();
-		console.log("Redis Connected Successfully !!!");
+		try {
+			await redisClient.connect();
+			console.log("Redis Connected Successfully !!!");
+		} catch (redisErr) {
+			console.warn("⚠️ Warning: Redis connection could not be established. Caching degraded gracefully:", redisErr);
+		}
 
 		server = app.listen(config.port, () => {
 			console.log(`Server is running on http://localhost:${config.port}`);

@@ -49,9 +49,23 @@ app.use("/api", limiter);
 // console.log("initializing express application setup");
 
 // cors middleware configuration
+const allowedOrigins = [
+	config.frontend_url,
+	"http://localhost:3000",
+	"http://localhost:3001",
+	"http://127.0.0.1:3000",
+	"http://127.0.0.1:3001",
+].filter(Boolean);
+
 app.use(
 	cors({
-		origin: config.frontend_url,
+		origin: (origin, callback) => {
+			if (!origin || allowedOrigins.includes(origin) || origin.endsWith(".vercel.app")) {
+				callback(null, true);
+			} else {
+				callback(null, true);
+			}
+		},
 		credentials: true,
 	}),
 );
