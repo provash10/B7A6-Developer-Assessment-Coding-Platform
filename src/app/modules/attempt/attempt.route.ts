@@ -1,8 +1,8 @@
 import { Router } from "express";
-import checkAuth from "../../middleware/checkAuth";
-import validateRequest from "../../middleware/validateRequest";
-import { AttemptController } from "./attempt.controller";
-import { AttemptValidation } from "./attempt.validation";
+import checkAuth from "../../middleware/checkAuth.js";
+import validateRequest from "../../middleware/validateRequest.js";
+import { AttemptController } from "./attempt.controller.js";
+import { AttemptValidation } from "./attempt.validation.js";
 
 const router = Router();
 

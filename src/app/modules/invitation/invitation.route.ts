@@ -1,8 +1,8 @@
 import { Router } from "express";
-import checkAuth from "../../middleware/checkAuth";
-import validateRequest from "../../middleware/validateRequest";
-import { InvitationController } from "./invitation.controller";
-import { InvitationValidation } from "./invitation.validation";
+import checkAuth from "../../middleware/checkAuth.js";
+import validateRequest from "../../middleware/validateRequest.js";
+import { InvitationController } from "./invitation.controller.js";
+import { InvitationValidation } from "./invitation.validation.js";
 
 const router = Router();
 

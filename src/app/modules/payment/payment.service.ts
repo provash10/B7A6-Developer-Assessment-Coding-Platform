@@ -1,11 +1,11 @@
 import config from "../../config.js";
-import { prisma } from "../../lib/prisma";
-import AppError from "../../utils/AppError";
+import { prisma } from "../../lib/prisma.js";
+import AppError from "../../utils/AppError.js";
 import type {
 	IExecutePaymentResponse,
 	IInitiatePaymentResponse,
 	IPaymentFilterParams,
-} from "./payment.interface";
+} from "./payment.interface.js";
 
 // cache bkash auth token in memory or redis with expiry
 let cachedBkashToken: string | null = null;

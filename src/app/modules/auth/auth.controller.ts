@@ -1,8 +1,8 @@
 import type { Request, Response } from "express";
-import AppError from "../../utils/AppError";
-import catchAsync from "../../utils/catchAsync";
-import sendResponse from "../../utils/sendResponse";
-import { AuthService } from "./auth.service";
+import AppError from "../../utils/AppError.js";
+import catchAsync from "../../utils/catchAsync.js";
+import sendResponse from "../../utils/sendResponse.js";
+import { AuthService } from "./auth.service.js";
 
 export const register = catchAsync(async (req: Request, res: Response) => {
 	const result = await AuthService.registerUser(req.body);

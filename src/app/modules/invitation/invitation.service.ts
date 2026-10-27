@@ -1,12 +1,12 @@
 import crypto from "crypto";
 import type { Prisma, UserRole } from "@prisma/client";
-import { sendEmail } from "../../lib/nodemailer";
-import { prisma } from "../../lib/prisma";
-import AppError from "../../utils/AppError";
+import { sendEmail } from "../../lib/nodemailer.js";
+import { prisma } from "../../lib/prisma.js";
+import AppError from "../../utils/AppError.js";
 import type {
 	IInvitationFilterParams,
 	ISendInvitationInput,
-} from "./invitation.interface";
+} from "./invitation.interface.js";
 
 export const sendInvitation = async (
 	userId: string,

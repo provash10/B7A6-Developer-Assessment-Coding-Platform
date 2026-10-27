@@ -1,12 +1,12 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import config from "../../config.js";
-import { googleClient } from "../../lib/googleAuth";
-import { sendEmail } from "../../lib/nodemailer";
-import { prisma } from "../../lib/prisma";
-import { redisClient } from "../../lib/redis";
-import AppError from "../../utils/AppError";
-import jwtUtils from "../../utils/jwt";
+import { googleClient } from "../../lib/googleAuth.js";
+import { sendEmail } from "../../lib/nodemailer.js";
+import { prisma } from "../../lib/prisma.js";
+import { redisClient } from "../../lib/redis.js";
+import AppError from "../../utils/AppError.js";
+import jwtUtils from "../../utils/jwt.js";
 import type {
 	IChangePasswordInput,
 	IForgotPasswordInput,
@@ -15,7 +15,7 @@ import type {
 	IRefreshTokenResponse,
 	IRegisterUserInput,
 	IResetPasswordInput,
-} from "./auth.interface";
+} from "./auth.interface.js";
 
 export const registerUser = async (payload: IRegisterUserInput) => {
 	const existingUser = await prisma.user.findUnique({

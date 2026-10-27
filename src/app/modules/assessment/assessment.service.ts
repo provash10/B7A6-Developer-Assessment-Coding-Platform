@@ -1,7 +1,7 @@
 import type { Prisma } from "@prisma/client";
-import { prisma } from "../../lib/prisma";
-import AppError from "../../utils/AppError";
-import { createAuditLog } from "../admin/admin.service";
+import { prisma } from "../../lib/prisma.js";
+import AppError from "../../utils/AppError.js";
+import { createAuditLog } from "../admin/admin.service.js";
 import type {
 	IAddQuestionToAssessmentInput,
 	IAssessmentAnalytics,
@@ -9,7 +9,7 @@ import type {
 	ICreateAssessmentInput,
 	ILeaderboardEntry,
 	IUpdateAssessmentInput,
-} from "./assessment.interface";
+} from "./assessment.interface.js";
 
 export const createAssessment = async (
 	userId: string,

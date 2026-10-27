@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
-import catchAsync from "../../utils/catchAsync";
-import sendResponse from "../../utils/sendResponse";
-import { QuestionService } from "./question.service";
+import catchAsync from "../../utils/catchAsync.js";
+import sendResponse from "../../utils/sendResponse.js";
+import { QuestionService } from "./question.service.js";
 
 export const createQuestion = catchAsync(
 	async (req: Request, res: Response) => {

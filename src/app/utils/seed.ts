@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import config from "../config.js";
-import { prisma } from "../lib/prisma";
+import { prisma } from "../lib/prisma.js";
 
 const sampleQuestions = [
 	{

@@ -1,10 +1,10 @@
 import { type Prisma, UserRole } from "@prisma/client";
-import { prisma } from "../../lib/prisma";
+import { prisma } from "../../lib/prisma.js";
 import type {
 	IAuditLogFilterParams,
 	ICreateAuditLogPayload,
 	IDashboardStatsResponse,
-} from "./admin.interface";
+} from "./admin.interface.js";
 
 export const getDashboardStats = async (): Promise<IDashboardStatsResponse> => {
 	// console.log("fetching dashboard stats from database");

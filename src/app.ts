@@ -8,16 +8,16 @@ import express, {
 import { rateLimit } from "express-rate-limit";
 import helmet from "helmet";
 import config from "./app/config.js";
-import { globalErrorHandler } from "./app/middleware/globalErrorHandler";
-import { notFound } from "./app/middleware/notFound";
-import { AdminRoutes } from "./app/modules/admin/admin.route";
-import { AssessmentRoutes } from "./app/modules/assessment/assessment.route";
-import { AttemptRoutes } from "./app/modules/attempt/attempt.route";
-import { AuthRoutes } from "./app/modules/auth/auth.route";
-import { InvitationRoutes } from "./app/modules/invitation/invitation.route";
-import { PaymentRoutes } from "./app/modules/payment/payment.route";
-import { QuestionRoutes } from "./app/modules/question/question.route";
-import { UserRoutes } from "./app/modules/user/user.route";
+import { globalErrorHandler } from "./app/middleware/globalErrorHandler.js";
+import { notFound } from "./app/middleware/notFound.js";
+import { AdminRoutes } from "./app/modules/admin/admin.route.js";
+import { AssessmentRoutes } from "./app/modules/assessment/assessment.route.js";
+import { AttemptRoutes } from "./app/modules/attempt/attempt.route.js";
+import { AuthRoutes } from "./app/modules/auth/auth.route.js";
+import { InvitationRoutes } from "./app/modules/invitation/invitation.route.js";
+import { PaymentRoutes } from "./app/modules/payment/payment.route.js";
+import { QuestionRoutes } from "./app/modules/question/question.route.js";
+import { UserRoutes } from "./app/modules/user/user.route.js";
 
 const app: Application = express();
 

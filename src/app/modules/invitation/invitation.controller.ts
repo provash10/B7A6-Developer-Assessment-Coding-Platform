@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
-import catchAsync from "../../utils/catchAsync";
-import sendResponse from "../../utils/sendResponse";
-import { InvitationService } from "./invitation.service";
+import catchAsync from "../../utils/catchAsync.js";
+import sendResponse from "../../utils/sendResponse.js";
+import { InvitationService } from "./invitation.service.js";
 
 export const sendInvitation = catchAsync(
 	async (req: Request, res: Response) => {

@@ -1,7 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import type { ZodTypeAny } from "zod";
-import AppError from "../utils/AppError";
-import catchAsync from "../utils/catchAsync";
+import AppError from "../utils/AppError.js";
+import catchAsync from "../utils/catchAsync.js";
 
 export const validateRequest = (zodSchema: ZodTypeAny) => {
 	return catchAsync(

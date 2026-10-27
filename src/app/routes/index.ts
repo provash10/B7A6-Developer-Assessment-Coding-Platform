@@ -1,12 +1,12 @@
 import { Router } from "express";
-import { AdminRoutes } from "../modules/admin/admin.route";
-import { AssessmentRoutes } from "../modules/assessment/assessment.route";
-import { AttemptRoutes } from "../modules/attempt/attempt.route";
-import { AuthRoutes } from "../modules/auth/auth.route";
-import { InvitationRoutes } from "../modules/invitation/invitation.route";
-import { PaymentRoutes } from "../modules/payment/payment.route";
-import { QuestionRoutes } from "../modules/question/question.route";
-import { UserRoutes } from "../modules/user/user.route";
+import { AdminRoutes } from "../modules/admin/admin.route.js";
+import { AssessmentRoutes } from "../modules/assessment/assessment.route.js";
+import { AttemptRoutes } from "../modules/attempt/attempt.route.js";
+import { AuthRoutes } from "../modules/auth/auth.route.js";
+import { InvitationRoutes } from "../modules/invitation/invitation.route.js";
+import { PaymentRoutes } from "../modules/payment/payment.route.js";
+import { QuestionRoutes } from "../modules/question/question.route.js";
+import { UserRoutes } from "../modules/user/user.route.js";
 
 const router = Router();
 

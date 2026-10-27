@@ -7,7 +7,7 @@ import type {
 } from "express";
 import { ZodError } from "zod";
 import config from "../config.js";
-import AppError from "../utils/AppError";
+import AppError from "../utils/AppError.js";
 
 export type TErrorSources = {
 	path: string | number;

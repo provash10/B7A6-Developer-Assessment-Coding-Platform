@@ -1,11 +1,11 @@
 import type { Prisma } from "@prisma/client";
-import { prisma } from "../../lib/prisma";
-import AppError from "../../utils/AppError";
+import { prisma } from "../../lib/prisma.js";
+import AppError from "../../utils/AppError.js";
 import type {
 	ICreateQuestionInput,
 	IQuestionFilterParams,
 	IUpdateQuestionInput,
-} from "./question.interface";
+} from "./question.interface.js";
 
 export const createQuestion = async (payload: ICreateQuestionInput) => {
 	const question = await prisma.question.create({

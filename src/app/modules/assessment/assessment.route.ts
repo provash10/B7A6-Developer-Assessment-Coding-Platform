@@ -1,8 +1,8 @@
 import { Router } from "express";
-import checkAuth from "../../middleware/checkAuth";
-import validateRequest from "../../middleware/validateRequest";
-import { AssessmentController } from "./assessment.controller";
-import { AssessmentValidation } from "./assessment.validation";
+import checkAuth from "../../middleware/checkAuth.js";
+import validateRequest from "../../middleware/validateRequest.js";
+import { AssessmentController } from "./assessment.controller.js";
+import { AssessmentValidation } from "./assessment.validation.js";
 
 const router = Router();
 

@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
-import catchAsync from "../../utils/catchAsync";
-import sendResponse from "../../utils/sendResponse";
-import { AdminService } from "./admin.service";
+import catchAsync from "../../utils/catchAsync.js";
+import sendResponse from "../../utils/sendResponse.js";
+import { AdminService } from "./admin.service.js";
 
 export const getDashboardStats = catchAsync(
 	async (_req: Request, res: Response) => {

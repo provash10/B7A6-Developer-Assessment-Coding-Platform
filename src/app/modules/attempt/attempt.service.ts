@@ -1,6 +1,6 @@
 import type { Prisma, UserRole } from "@prisma/client";
-import { prisma } from "../../lib/prisma";
-import AppError from "../../utils/AppError";
+import { prisma } from "../../lib/prisma.js";
+import AppError from "../../utils/AppError.js";
 import type {
 	IAntiCheatResponse,
 	IAttemptResultResponse,
@@ -11,7 +11,7 @@ import type {
 	IStartAttemptResponse,
 	ISubmitAnswerInput,
 	ISubmissionResultResponse,
-} from "./attempt.interface";
+} from "./attempt.interface.js";
 
 export const startAttempt = async (
 	attemptId: string,

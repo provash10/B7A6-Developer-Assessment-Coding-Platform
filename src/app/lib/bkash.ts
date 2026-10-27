@@ -1,6 +1,6 @@
 import config from "../config.js";
-import AppError from "../utils/AppError";
-import { redisClient } from "./redis";
+import AppError from "../utils/AppError.js";
+import { redisClient } from "./redis.js";
 
 interface IBkashGrantTokenResponse {
 	statusCode?: string;

@@ -1,8 +1,8 @@
 import type { Request, Response } from "express";
 import type { UserRole } from "@prisma/client";
-import catchAsync from "../../utils/catchAsync";
-import sendResponse from "../../utils/sendResponse";
-import { AttemptService } from "./attempt.service";
+import catchAsync from "../../utils/catchAsync.js";
+import sendResponse from "../../utils/sendResponse.js";
+import { AttemptService } from "./attempt.service.js";
 
 export const startAttempt = catchAsync(async (req: Request, res: Response) => {
 	const userId = req.user?.userId as string;

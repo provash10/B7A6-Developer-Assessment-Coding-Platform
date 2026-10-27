@@ -2,10 +2,10 @@ import type { UserRole } from "@prisma/client";
 import type { NextFunction, Request, Response } from "express";
 import type { JwtPayload } from "jsonwebtoken";
 import config from "../config.js";
-import { prisma } from "../lib/prisma";
-import AppError from "../utils/AppError";
-import catchAsync from "../utils/catchAsync";
-import jwtUtils from "../utils/jwt";
+import { prisma } from "../lib/prisma.js";
+import AppError from "../utils/AppError.js";
+import catchAsync from "../utils/catchAsync.js";
+import jwtUtils from "../utils/jwt.js";
 
 export interface RequestUser {
 	userId: string;

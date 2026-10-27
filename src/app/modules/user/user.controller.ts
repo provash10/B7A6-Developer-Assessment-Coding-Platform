@@ -1,8 +1,8 @@
 import type { Request, Response } from "express";
-import AppError from "../../utils/AppError";
-import catchAsync from "../../utils/catchAsync";
-import sendResponse from "../../utils/sendResponse";
-import { UserService } from "./user.service";
+import AppError from "../../utils/AppError.js";
+import catchAsync from "../../utils/catchAsync.js";
+import sendResponse from "../../utils/sendResponse.js";
+import { UserService } from "./user.service.js";
 
 export const getMyProfile = catchAsync(async (req: Request, res: Response) => {
 	// console.log(req.user);

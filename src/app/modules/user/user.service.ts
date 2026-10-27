@@ -1,10 +1,10 @@
 import type { UserRole } from "@prisma/client";
 import type { UploadApiResponse } from "cloudinary";
-import { cloudinary } from "../../lib/cloudinary";
-import { prisma } from "../../lib/prisma";
-import AppError from "../../utils/AppError";
-import { createAuditLog } from "../admin/admin.service";
-import type { IUpdateProfileInput, IUserFilterParams } from "./user.interface";
+import { cloudinary } from "../../lib/cloudinary.js";
+import { prisma } from "../../lib/prisma.js";
+import AppError from "../../utils/AppError.js";
+import { createAuditLog } from "../admin/admin.service.js";
+import type { IUpdateProfileInput, IUserFilterParams } from "./user.interface.js";
 
 export const getMyProfile = async (userId: string) => {
 	const user = await prisma.user.findUnique({

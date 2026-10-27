@@ -1,8 +1,8 @@
 import { Router } from "express";
-import checkAuth from "../../middleware/checkAuth";
-import validateRequest from "../../middleware/validateRequest";
-import { QuestionController } from "./question.controller";
-import { QuestionValidation } from "./question.validation";
+import checkAuth from "../../middleware/checkAuth.js";
+import validateRequest from "../../middleware/validateRequest.js";
+import { QuestionController } from "./question.controller.js";
+import { QuestionValidation } from "./question.validation.js";
 
 const router = Router();
 
