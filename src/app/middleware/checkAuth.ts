@@ -1,7 +1,7 @@
 import type { UserRole } from "@prisma/client";
 import type { NextFunction, Request, Response } from "express";
 import type { JwtPayload } from "jsonwebtoken";
-import config from "../config";
+import config from "../config.js";
 import { prisma } from "../lib/prisma";
 import AppError from "../utils/AppError";
 import catchAsync from "../utils/catchAsync";

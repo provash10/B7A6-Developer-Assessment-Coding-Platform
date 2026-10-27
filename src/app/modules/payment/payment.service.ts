@@ -1,4 +1,4 @@
-import config from "../../config";
+import config from "../../config.js";
 import { prisma } from "../../lib/prisma";
 import AppError from "../../utils/AppError";
 import type {

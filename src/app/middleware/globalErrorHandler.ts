@@ -6,7 +6,7 @@ import type {
 	Response,
 } from "express";
 import { ZodError } from "zod";
-import config from "../config";
+import config from "../config.js";
 import AppError from "../utils/AppError";
 
 export type TErrorSources = {

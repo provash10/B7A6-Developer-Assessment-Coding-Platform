@@ -2,7 +2,7 @@ import ejs from "ejs";
 import fs from "fs";
 import nodemailer from "nodemailer";
 import path from "path";
-import config from "../config";
+import config from "../config.js";
 
 export const transporter = nodemailer.createTransport({
 	service: "gmail",

@@ -7,7 +7,7 @@ import express, {
 } from "express";
 import { rateLimit } from "express-rate-limit";
 import helmet from "helmet";
-import config from "./app/config";
+import config from "./app/config.js";
 import { globalErrorHandler } from "./app/middleware/globalErrorHandler";
 import { notFound } from "./app/middleware/notFound";
 import { AdminRoutes } from "./app/modules/admin/admin.route";

@@ -1,6 +1,6 @@
 import type { Server } from "http";
 import app from "./app.js";
-import config from "./app/config";
+import config from "./app/config.js";
 import { prisma } from "./app/lib/prisma";
 import { redisClient } from "./app/lib/redis";
 
