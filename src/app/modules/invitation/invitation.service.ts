@@ -46,6 +46,13 @@ export const sendInvitation = async (
 				"You do not have permission to send invitations for this assessment.",
 			);
 		}
+
+		if (recruiterProfile.credits < 1) {
+			throw new AppError(
+				400,
+				"Insufficient assessment credits. Please buy credits via bKash to invite candidates.",
+			);
+		}
 	}
 
 	// ensure assessment has assigned questions
@@ -217,6 +224,17 @@ export const sendInvitation = async (
 		},
 	});
 	// console.log("assessment invitation created successfully in db:", invitation.id);
+
+	if (recruiterProfile) {
+		await prisma.recruiterProfile.update({
+			where: { id: recruiterProfile.id },
+			data: {
+				credits: {
+					decrement: 1,
+				},
+			},
+		});
+	}
 
 	// send invitation email to candidate in background
 	// console.log("triggering invitation email to candidate:", candidateuser.email);
