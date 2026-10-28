@@ -109,6 +109,14 @@ export const sendInvitation = async (
 	const candidateId = candidateProfile.id;
 	// console.log("found candidate profile id:", candidateid);
 
+	// calculate expiry date
+	const expiresInDays =
+		payload.expiresInDays && payload.expiresInDays > 0
+			? payload.expiresInDays
+			: 7;
+	const expiresAt = new Date();
+	expiresAt.setDate(expiresAt.getDate() + expiresInDays);
+
 	// prevent duplicate active invitations
 	// console.log("checking existing active invitation for assessment id:", payload.assessmentid, "candidate id:", candidateid);
 	const existingInvitation = await prisma.assessmentInvitation.findFirst({
@@ -175,14 +183,7 @@ export const sendInvitation = async (
 	const inviteToken = crypto.randomUUID();
 	// console.log("generated unique invite token:", invitetoken);
 
-	// calculate expiry date
-	const expiresInDays =
-		payload.expiresInDays && payload.expiresInDays > 0
-			? payload.expiresInDays
-			: 7;
-	const expiresAt = new Date();
-	expiresAt.setDate(expiresAt.getDate() + expiresInDays);
-	// console.log("calculated expires at date:", expiresat);
+	// console.log("calculated expires at date:", expiresAt);
 
 	// create assessment invitation record in database
 	// console.log("inserting assessment invitation record into database with status pending");
