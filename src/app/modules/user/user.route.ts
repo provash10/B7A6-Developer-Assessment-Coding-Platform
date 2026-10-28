@@ -29,7 +29,7 @@ router.patch(
 	UserController.uploadCompanyLogo,
 );
 
-router.get("/", checkAuth("ADMIN"), UserController.getAllUsers);
+router.get("/", checkAuth("ADMIN", "RECRUITER"), UserController.getAllUsers);
 router.patch("/:id/role", checkAuth("ADMIN"), UserController.updateUserRole);
 
 export const UserRoutes = router;
