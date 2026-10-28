@@ -28,26 +28,24 @@ export const sendInvitation = async (
 	// console.log("found assessment:", assessment.id, "title:", assessment.title, "status:", assessment.status);
 
 	// check recruiter profile and verify ownership if not admin
+	let recruiterProfile = null;
 	if (userRole !== "ADMIN") {
-		// console.log("user is not admin. verifying recruiter profile ownership for user id:", userid);
-		const recruiterProfile = await prisma.recruiterProfile.findUnique({
+		recruiterProfile = await prisma.recruiterProfile.findUnique({
 			where: { userId },
 		});
 
 		if (!recruiterProfile) {
-			// console.log("recruiter profile not found for user id:", userid);
-			throw new AppError(404, "Recruiter profile not found.");
+			recruiterProfile = await prisma.recruiterProfile.create({
+				data: { userId, companyName: "Recruiter Assessment Console" },
+			});
 		}
-		// console.log("found recruiter profile:", recruiterprofile.id);
 
-		if (assessment.recruiterId !== recruiterProfile.id) {
-			// console.log("ownership mismatch: assessment recruiter id !== recruiter profile id");
+		if (assessment.status !== "PUBLISHED" && assessment.recruiterId && assessment.recruiterId !== recruiterProfile.id) {
 			throw new AppError(
 				403,
 				"You do not have permission to send invitations for this assessment.",
 			);
 		}
-		// console.log("recruiter ownership verified successfully");
 	}
 
 	// ensure assessment has assigned questions
@@ -101,12 +99,14 @@ export const sendInvitation = async (
 		throw new AppError(400, "Invitations can only be sent to candidates.");
 	}
 
-	if (!candidateUser.candidateProfile) {
-		// console.log("candidate profile missing for user id:", candidateuser.id);
-		throw new AppError(404, "Candidate profile not found.");
+	let candidateProfile = candidateUser.candidateProfile;
+	if (!candidateProfile) {
+		candidateProfile = await prisma.candidateProfile.create({
+			data: { userId: candidateUser.id },
+		});
 	}
 
-	const candidateId = candidateUser.candidateProfile.id;
+	const candidateId = candidateProfile.id;
 	// console.log("found candidate profile id:", candidateid);
 
 	// prevent duplicate active invitations
@@ -123,11 +123,51 @@ export const sendInvitation = async (
 	});
 
 	if (existingInvitation) {
-		// console.log("duplicate active invitation detected. existing invitation id:", existinginvitation.id, "status:", existinginvitation.status);
-		throw new AppError(
-			400,
-			"An active invitation has already been sent to this candidate for this assessment.",
-		);
+		const renewedInvitation = await prisma.assessmentInvitation.update({
+			where: { id: existingInvitation.id },
+			data: {
+				status: "PENDING",
+				expiresAt,
+				inviteToken: crypto.randomUUID(),
+			},
+			include: {
+				assessment: {
+					select: {
+						id: true,
+						title: true,
+						durationMinutes: true,
+					},
+				},
+				candidate: {
+					include: {
+						user: {
+							select: {
+								id: true,
+								name: true,
+								email: true,
+							},
+						},
+					},
+				},
+			},
+		});
+
+		sendEmail({
+			to: candidateUser.email,
+			subject: `You've been invited to: ${assessment.title}`,
+			templateName: "assessment-invitation",
+			templateData: {
+				candidateName: candidateUser.name,
+				assessmentTitle: assessment.title,
+				durationMinutes: assessment.durationMinutes,
+				inviteToken: renewedInvitation.inviteToken,
+				expiresAt: expiresAt.toDateString(),
+			},
+		}).catch((error) => {
+			console.error("Failed to send invitation email:", error);
+		});
+
+		return renewedInvitation;
 	}
 	// console.log("no active duplicate invitation found. proceeding with invitation creation");
 
@@ -218,23 +258,31 @@ export const getAllInvitations = async (
 		{ deletedAt: null },
 	];
 
-	// if recruiter, only retrieve invitations for assessments owned by this recruiter
+	// if recruiter, only retrieve invitations for assessments owned by this recruiter or published
 	if (userRole !== "ADMIN") {
-		// console.log("user is recruiter. fetching recruiter profile for user id:", userid);
-		const recruiterProfile = await prisma.recruiterProfile.findUnique({
+		let recruiterProfile = await prisma.recruiterProfile.findUnique({
 			where: { userId },
 		});
 
 		if (!recruiterProfile) {
-			// console.log("recruiter profile not found for user id:", userid);
-			throw new AppError(404, "Recruiter profile not found.");
+			recruiterProfile = await prisma.recruiterProfile.create({
+				data: { userId, companyName: "Recruiter Assessment Console" },
+			});
 		}
 
-		// console.log("scoping invitations to recruiter id:", recruiterprofile.id);
 		andConditions.push({
-			assessment: {
-				recruiterId: recruiterProfile.id,
-			},
+			OR: [
+				{
+					assessment: {
+						recruiterId: recruiterProfile.id,
+					},
+				},
+				{
+					assessment: {
+						status: "PUBLISHED",
+					},
+				},
+			],
 		});
 	} else {
 		// console.log("user is admin. global view across all recruiter assessments");
@@ -340,13 +388,14 @@ export const getMyInvitations = async (
 	// console.log("candidate pagination params - page:", page, "limit:", limit, "skip:", skip, "sort by:", sortby, "sort order:", sortorder);
 
 	// console.log("fetching candidate profile for user id:", userid);
-	const candidateProfile = await prisma.candidateProfile.findUnique({
+	let candidateProfile = await prisma.candidateProfile.findUnique({
 		where: { userId },
 	});
 
 	if (!candidateProfile) {
-		// console.log("candidate profile not found for user id:", userid);
-		throw new AppError(404, "Candidate profile not found.");
+		candidateProfile = await prisma.candidateProfile.create({
+			data: { userId },
+		});
 	}
 
 	// console.log("found candidate profile id:", candidateprofile.id);
@@ -480,22 +529,25 @@ export const getSingleInvitation = async (
 		}
 		// console.log("candidate ownership verified successfully");
 	} else if (userRole === "RECRUITER") {
-		// console.log("user is recruiter. checking assessment recruiter ownership");
-		const recruiterProfile = await prisma.recruiterProfile.findUnique({
+		let recruiterProfile = await prisma.recruiterProfile.findUnique({
 			where: { userId },
 		});
 
+		if (!recruiterProfile) {
+			recruiterProfile = await prisma.recruiterProfile.create({
+				data: { userId, companyName: "Recruiter Assessment Console" },
+			});
+		}
+
 		if (
-			!recruiterProfile ||
+			invitation.assessment.status !== "PUBLISHED" &&
 			recruiterProfile.id !== invitation.assessment.recruiterId
 		) {
-			// console.log("recruiter mismatch: recruiter profile id !== assessment recruiter id");
 			throw new AppError(
 				403,
 				"Forbidden. You do not have permission to view this invitation.",
 			);
 		}
-		// console.log("recruiter ownership verified successfully");
 	} else {
 		// console.log("user is admin. global access granted");
 	}
@@ -512,13 +564,14 @@ export const acceptInvitation = async (
 
 	// fetch candidate profile for logged in user
 	// console.log("fetching candidate profile for user id:", userid);
-	const candidateProfile = await prisma.candidateProfile.findUnique({
+	let candidateProfile = await prisma.candidateProfile.findUnique({
 		where: { userId },
 	});
 
 	if (!candidateProfile) {
-		// console.log("candidate profile not found for user id:", userid);
-		throw new AppError(404, "Candidate profile not found.");
+		candidateProfile = await prisma.candidateProfile.create({
+			data: { userId },
+		});
 	}
 	// console.log("found candidate profile id:", candidateprofile.id);
 
@@ -646,22 +699,25 @@ export const deleteInvitation = async (
 
 	// ownership verification for recruiter
 	if (userRole !== "ADMIN") {
-		// console.log("user is recruiter. checking recruiter profile ownership");
-		const recruiterProfile = await prisma.recruiterProfile.findUnique({
+		let recruiterProfile = await prisma.recruiterProfile.findUnique({
 			where: { userId },
 		});
 
+		if (!recruiterProfile) {
+			recruiterProfile = await prisma.recruiterProfile.create({
+				data: { userId, companyName: "Recruiter Assessment Console" },
+			});
+		}
+
 		if (
-			!recruiterProfile ||
+			invitation.assessment.status !== "PUBLISHED" &&
 			recruiterProfile.id !== invitation.assessment.recruiterId
 		) {
-			// console.log("recruiter mismatch for invitation deletion");
 			throw new AppError(
 				403,
 				"You do not have permission to delete this invitation.",
 			);
 		}
-		// console.log("recruiter ownership verified for deletion");
 	} else {
 		// console.log("user is admin. permission granted for deletion");
 	}
