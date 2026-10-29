@@ -76,7 +76,7 @@ export const createAssessment = async (
 				durationMinutes: payload.durationMinutes,
 				passMarks: payload.passMarks,
 				totalMarks,
-				status: "DRAFT",
+				status: (payload as any).status || "PUBLISHED",
 				startTime: payload.startTime ? new Date(payload.startTime) : null,
 				endTime: payload.endTime ? new Date(payload.endTime) : null,
 			},

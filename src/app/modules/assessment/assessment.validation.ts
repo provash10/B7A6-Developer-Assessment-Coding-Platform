@@ -15,6 +15,7 @@ const createAssessmentZodSchema = z.object({
 		passMarks: z.number().nonnegative("Pass marks must be 0 or greater"),
 		startTime: z.string().datetime().optional(),
 		endTime: z.string().datetime().optional(),
+		status: z.enum(["DRAFT", "PUBLISHED", "ARCHIVED"]).optional(),
 		questions: z.array(questionAssignmentSchema).optional(),
 	}),
 });
