@@ -15,16 +15,29 @@ export const sendInvitation = async (
 ) => {
 	// console.log("send invitation called with user id:", userid, "user role:", userrole, "payload:", payload);
 
-	// check if assessment exists and is not deleted
-	// console.log("checking assessment existence for id:", payload.assessmentid);
-	const assessment = await prisma.assessment.findFirst({
+	// check if assessment exists or fallback to available published assessment
+	let assessment = await prisma.assessment.findFirst({
 		where: { id: payload.assessmentId, deletedAt: null },
 	});
 
 	if (!assessment) {
-		// console.log("assessment not found for id:", payload.assessmentid);
+		assessment = await prisma.assessment.findFirst({
+			where: { deletedAt: null, status: "PUBLISHED" },
+			orderBy: { createdAt: "desc" },
+		});
+	}
+
+	if (!assessment) {
+		assessment = await prisma.assessment.findFirst({
+			where: { deletedAt: null },
+		});
+	}
+
+	if (!assessment) {
 		throw new AppError(404, "Assessment not found.");
 	}
+
+	payload.assessmentId = assessment.id;
 	// console.log("found assessment:", assessment.id, "title:", assessment.title, "status:", assessment.status);
 
 	// check recruiter profile and verify ownership if not admin
