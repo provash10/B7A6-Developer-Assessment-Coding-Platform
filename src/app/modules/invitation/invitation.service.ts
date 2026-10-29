@@ -96,8 +96,7 @@ export const sendInvitation = async (
 	});
 
 	if (!candidateUser || candidateUser.deletedAt) {
-		// console.log("candidate user not found or is deleted for email:", payload.candidateemail);
-		throw new AppError(404, "Candidate with this email not found.");
+		throw new AppError(404, "Candidate with this email not found. Please register the candidate account first.");
 	}
 	// console.log("found user for candidate email:", candidateuser.id, "role:", candidateuser.role);
 

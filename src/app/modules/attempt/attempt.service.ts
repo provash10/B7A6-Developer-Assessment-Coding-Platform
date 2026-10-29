@@ -824,6 +824,7 @@ export const getMyAttempts = async (
 					status: true,
 				},
 			},
+			submissions: true,
 		},
 	});
 
